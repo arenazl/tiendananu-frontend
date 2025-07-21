@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - ModernShop</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <style>
+        .fade-in { animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-lg sticky top-0 z-40">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <h1 class="text-3xl font-bold text-gray-800">
+                    <i class="fas fa-cogs mr-2"></i>Panel de Administración
+                </h1>
+                <div class="flex items-center space-x-4">
+                    <span id="adminUserName" class="text-gray-600"></span>
+                    <button id="logoutBtn" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Cerrar Sesión
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full m-4">
+            <h2 class="text-2xl font-bold mb-6 text-center">Acceso Administrativo</h2>
+            <form id="loginForm">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">
+                        Email
+                    </label>
+                    <input type="email" id="loginEmail" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" required>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">
+                        Contraseña
+                    </label>
+                    <input type="password" id="loginPassword" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" required>
+                </div>
+                <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition-colors">
+                    Ingresar
+                </button>
+            </form>
+            <div id="loginError" class="mt-4 text-red-500 text-sm text-center hidden"></div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main id="mainContent" class="container mx-auto px-4 py-8 hidden">
+        <!-- Navigation Tabs -->
+        <div class="bg-white rounded-lg shadow-lg mb-8">
+            <div class="border-b border-gray-200">
+                <nav class="flex space-x-8 px-6">
+                    <button class="tab-button py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 focus:border-gray-300 active" data-tab="categories">
+                        <i class="fas fa-tags mr-2"></i>Categorías
+                    </button>
+                    <button class="tab-button py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 focus:border-gray-300" data-tab="subcategories">
+                        <i class="fas fa-folder mr-2"></i>Subcategorías
+                    </button>
+                    <button class="tab-button py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 focus:border-gray-300" data-tab="products">
+                        <i class="fas fa-box mr-2"></i>Productos
+                    </button>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Categories Tab -->
+        <div id="categoriesTab" class="tab-content">
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">Gestión de Categorías</h2>
+                    <button id="addCategoryBtn" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                        <i class="fas fa-plus mr-2"></i>Agregar Categoría
+                    </button>
+                </div>
+                
+                <!-- Categories List -->
+                <div id="categoriesList" class="space-y-4">
+                    <!-- Categories will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Subcategories Tab -->
+        <div id="subcategoriesTab" class="tab-content hidden">
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">Gestión de Subcategorías</h2>
+                    <button id="addSubcategoryBtn" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                        <i class="fas fa-plus mr-2"></i>Agregar Subcategoría
+                    </button>
+                </div>
+                
+                <!-- Subcategories List -->
+                <div id="subcategoriesList" class="space-y-4">
+                    <!-- Subcategories will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Products Tab -->
+        <div id="productsTab" class="tab-content hidden">
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">Gestión de Productos</h2>
+                    <button id="addProductBtn" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                        <i class="fas fa-plus mr-2"></i>Agregar Producto
+                    </button>
+                </div>
+                
+                <!-- Products List -->
+                <div id="productsList" class="space-y-4">
+                    <!-- Products will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Category Form Modal -->
+    <div id="categoryModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full m-4">
+            <h2 id="categoryModalTitle" class="text-2xl font-bold mb-6">Agregar Categoría</h2>
+            <form id="categoryForm">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Nombre</label>
+                    <input type="text" id="categoryName" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Descripción</label>
+                    <textarea id="categoryDescription" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" rows="3"></textarea>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Imagen</label>
+                    <input type="file" id="categoryImage" accept="image/*" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+                    <div id="categoryImagePreview" class="mt-2 hidden">
+                        <img id="categoryPreviewImg" class="w-32 h-32 object-cover rounded">
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <button type="button" id="cancelCategoryBtn" class="px-4 py-2 text-gray-600 hover:text-gray-800">Cancelar</button>
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Subcategory Form Modal -->
+    <div id="subcategoryModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full m-4">
+            <h2 id="subcategoryModalTitle" class="text-2xl font-bold mb-6">Agregar Subcategoría</h2>
+            <form id="subcategoryForm">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Categoría</label>
+                    <select id="subcategoryCategory" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" required>
+                        <option value="">Seleccionar categoría</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Nombre</label>
+                    <input type="text" id="subcategoryName" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Descripción</label>
+                    <textarea id="subcategoryDescription" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" rows="3"></textarea>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Imagen</label>
+                    <input type="file" id="subcategoryImage" accept="image/*" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+                    <div id="subcategoryImagePreview" class="mt-2 hidden">
+                        <img id="subcategoryPreviewImg" class="w-32 h-32 object-cover rounded">
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <button type="button" id="cancelSubcategoryBtn" class="px-4 py-2 text-gray-600 hover:text-gray-800">Cancelar</button>
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Product Form Modal -->
+    <div id="productModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-8 max-w-2xl w-full m-4 max-h-[90vh] overflow-y-auto">
+            <h2 id="productModalTitle" class="text-2xl font-bold mb-6">Agregar Producto</h2>
+            <form id="productForm" enctype="multipart/form-data">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Nombre</label>
+                        <input type="text" id="productName" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Precio</label>
+                        <input type="number" id="productPrice" step="0.01" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" required>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Categoría</label>
+                        <select id="productCategory" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" required>
+                            <option value="">Seleccionar categoría</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Subcategoría</label>
+                        <select id="productSubcategory" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+                            <option value="">Seleccionar subcategoría</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Stock</label>
+                        <input type="number" id="productStock" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" value="0">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Estado</label>
+                        <select id="productActive" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+                            <option value="true">Activo</option>
+                            <option value="false">Inactivo</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Descripción</label>
+                    <textarea id="productDescription" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" rows="3"></textarea>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2 flex items-center">
+                        <i class="fas fa-star text-yellow-500 mr-2"></i>Producto Destacado
+                    </label>
+                    <label class="inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="productFeatured" class="sr-only peer">
+                        <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-yellow-500"></div>
+                        <span class="ml-3 text-sm font-medium text-gray-700">Marcar como destacado en el carrusel principal</span>
+                    </label>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Imagen</label>
+                    <input type="file" id="productImage" accept="image/*" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+                    <div id="imagePreview" class="mt-2 hidden">
+                        <img id="previewImg" class="w-32 h-32 object-cover rounded">
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <button type="button" id="cancelProductBtn" class="px-4 py-2 text-gray-600 hover:text-gray-800">Cancelar</button>
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script>
+        const API_BASE = API_BASE_URL; // From config.js
+        let currentUser = null;
+        let currentEditingId = null;
+        let categories = [];
+        let subcategories = [];
+        
+        // Configuración de toastr
+        toastr.options = {
+            "closeButton": true,
+            "debug": false,
+            "newestOnTop": true,
+            "progressBar": true,
+            "positionClass": "toast-top-right",
+            "preventDuplicates": false,
+            "onclick": null,
+            "showDuration": "300",
+            "hideDuration": "1000",
+            "timeOut": "5000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        };
+
+        // Notification Helper Service
+        const NotificationService = {
+            success: function(message, title = 'Éxito') {
+                toastr.success(message, title);
+            },
+            
+            error: function(message, title = 'Error') {
+                toastr.error(message, title);
+            },
+            
+            info: function(message, title = 'Información') {
+                toastr.info(message, title);
+            },
+            
+            warning: function(message, title = 'Advertencia') {
+                toastr.warning(message, title);
+            },
+            
+            confirm: function(message, title = '¿Está seguro?') {
+                return confirm(`${title}\n\n${message}`);
+            },
+            
+            confirmDelete: function(itemType = 'elemento') {
+                return this.confirm(
+                    `Esta acción no se puede deshacer.`,
+                    `¿Eliminar ${itemType}?`
+                );
+            },
+            
+            showDeleted: function(itemType = 'elemento') {
+                this.success(`${itemType} eliminado exitosamente.`, '¡Eliminado!');
+            },
+            
+            showCreated: function(itemType = 'elemento') {
+                this.success(`${itemType} creado exitosamente.`, '¡Creado!');
+            },
+            
+            showUpdated: function(itemType = 'elemento') {
+                this.success(`${itemType} actualizado exitosamente.`, '¡Actualizado!');
+            },
+            
+            showSaved: function(itemType = 'elemento', isUpdate = false) {
+                if (isUpdate) {
+                    this.showUpdated(itemType);
+                } else {
+                    this.showCreated(itemType);
+                }
+            },
+            
+            showError: function(error, defaultMessage = 'Ha ocurrido un error') {
+                const message = error?.message || error || defaultMessage;
+                this.error(message);
+            },
+            
+            redirectAfterError: function(message, redirectUrl, delay = 2000) {
+                this.error(message);
+                setTimeout(() => {
+                    window.location.href = redirectUrl;
+                }, delay);
+            }
+        };
+        let products = [];
+        let isLoading = {
+            categories: false,
+            subcategories: false,
+            products: false
+        };
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            setupEventListeners();
+            checkAuth();
+        });
+
+        function checkAuth() {
+            const token = localStorage.getItem('adminToken') || localStorage.getItem('token') || localStorage.getItem('authToken');
+            if (!token) {
+                showLoginModal();
+                return;
+            }
+
+            // Only verify token if we have one
+            fetch(`${API_BASE}/auth/me`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Auth verification failed');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Auth check response:', data);
+                if (data.user) {
+                    console.log('User is_admin:', data.user.is_admin);
+                    if (data.user.is_admin === true || data.user.is_admin === 1) {
+                        currentUser = data.user;
+                        showMainContent();
+                    } else {
+                        // User is not admin
+                        console.log('User is not admin, is_admin value:', data.user.is_admin);
+                        toastr.error('Esta página es solo para administradores.', 'Acceso Denegado');
+                        setTimeout(() => {
+                            window.location.href = 'index.html'; // Redirect to home page
+                        }, 2000);
+                        localStorage.removeItem('adminToken');
+                    }
+                } else {
+                    // Invalid token
+                    localStorage.removeItem('adminToken');
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('authToken');
+                    showLoginModal();
+                }
+            })
+            .catch(error => {
+                console.error('Auth check failed:', error);
+                // Clear tokens and show login
+                localStorage.removeItem('adminToken');
+                localStorage.removeItem('token');
+                localStorage.removeItem('authToken');
+                showLoginModal();
+            });
+        }
+
+        function showLoginModal() {
+            document.getElementById('loginModal').classList.remove('hidden');
+            document.getElementById('mainContent').classList.add('hidden');
+        }
+
+        function showMainContent() {
+            document.getElementById('loginModal').classList.add('hidden');
+            document.getElementById('mainContent').classList.remove('hidden');
+            document.getElementById('adminUserName').textContent = `Bienvenido, ${currentUser.first_name || currentUser.email}`;
+            loadInitialData();
+        }
+
+        function setupEventListeners() {
+            // Login form
+            document.getElementById('loginForm').addEventListener('submit', handleLogin);
+            
+            // Logout button
+            document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+            
+            // Tab navigation
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    const tab = this.getAttribute('data-tab');
+                    switchTab(tab);
+                });
+            });
+
+            // Add buttons
+            document.getElementById('addCategoryBtn').addEventListener('click', () => showCategoryModal());
+            document.getElementById('addSubcategoryBtn').addEventListener('click', () => showSubcategoryModal());
+            document.getElementById('addProductBtn').addEventListener('click', () => showProductModal());
+
+            // Modal forms
+            document.getElementById('categoryForm').addEventListener('submit', handleCategorySubmit);
+            document.getElementById('subcategoryForm').addEventListener('submit', handleSubcategorySubmit);
+            document.getElementById('productForm').addEventListener('submit', handleProductSubmit);
+
+            // Cancel buttons
+            document.getElementById('cancelCategoryBtn').addEventListener('click', hideCategoryModal);
+            document.getElementById('cancelSubcategoryBtn').addEventListener('click', hideSubcategoryModal);
+            document.getElementById('cancelProductBtn').addEventListener('click', hideProductModal);
+
+            // Product category change
+            document.getElementById('productCategory').addEventListener('change', handleCategoryChange);
+
+            // Image preview
+            document.getElementById('productImage').addEventListener('change', handleImagePreview);
+            document.getElementById('categoryImage').addEventListener('change', handleCategoryImagePreview);
+            document.getElementById('subcategoryImage').addEventListener('change', handleSubcategoryImagePreview);
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const errorDiv = document.getElementById('loginError');
+
+            fetch(`${API_BASE}/auth/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Login response:', data);
+                if (data.token && data.user && (data.user.is_admin === true || data.user.is_admin === 1)) {
+                    localStorage.setItem('adminToken', data.token);
+                    localStorage.setItem('authToken', data.token);
+                    currentUser = data.user;
+                    errorDiv.classList.add('hidden');
+                    // Go directly to main content without re-checking
+                    showMainContent();
+                } else if (data.token && data.user && (data.user.is_admin === false || data.user.is_admin === 0)) {
+                    errorDiv.textContent = 'Acceso denegado. Solo administradores pueden acceder.';
+                    errorDiv.classList.remove('hidden');
+                } else {
+                    errorDiv.textContent = data.error || 'Credenciales inválidas.';
+                    errorDiv.classList.remove('hidden');
+                }
+            })
+            .catch(error => {
+                console.error('Login error:', error);
+                errorDiv.textContent = 'Error de conexión. Intente nuevamente.';
+                errorDiv.classList.remove('hidden');
+            });
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('adminToken');
+            currentUser = null;
+            showLoginModal();
+        }
+
+        function switchTab(tab) {
+            // Update buttons
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active', 'border-blue-500', 'text-blue-600');
+                button.classList.add('border-transparent', 'text-gray-500');
+            });
+            
+            document.querySelector(`[data-tab="${tab}"]`).classList.add('active', 'border-blue-500', 'text-blue-600');
+            document.querySelector(`[data-tab="${tab}"]`).classList.remove('border-transparent', 'text-gray-500');
+
+            // Update content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            document.getElementById(`${tab}Tab`).classList.remove('hidden');
+
+            // Load data for the active tab
+            if (tab === 'categories') {
+                loadCategories();
+            } else if (tab === 'subcategories') {
+                loadSubcategories();
+            } else if (tab === 'products') {
+                loadProducts();
+            }
+        }
+
+        function loadInitialData() {
+            loadCategories();
+            loadSubcategories();
+            loadProducts();
+        }
+
+        function getAuthHeaders() {
+            const token = localStorage.getItem('adminToken') || localStorage.getItem('token') || localStorage.getItem('authToken');
+            return {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            };
+        }
+
+        // Categories functions
+        function loadCategories() {
+            if (isLoading.categories) {
+                console.log('Already loading categories, skipping...');
+                return;
+            }
+            
+            isLoading.categories = true;
+            console.log('Loading categories...');
+            
+            fetch(`${API_BASE}/admin/categories`, {
+                headers: getAuthHeaders()
+            })
+            .then(response => {
+                console.log('Categories response status:', response.status);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Categories loaded:', data);
+                categories = data;
+                renderCategories();
+                updateCategorySelects();
+                isLoading.categories = false;
+            })
+            .catch(error => {
+                console.error('Error loading categories:', error);
+                isLoading.categories = false;
+                // Don't show error modal to avoid loops
+                console.error('Failed to load categories:', error.message);
+            });
+        }
+
+        function renderCategories() {
+            const container = document.getElementById('categoriesList');
+            container.innerHTML = categories.map(category => `
+                <div class="border rounded-lg p-4 flex justify-between items-center hover:shadow-lg transition-shadow">
+                    <div class="flex items-center space-x-4">
+                        ${category.image_url ? 
+                            `<img src="${category.image_url}" alt="${category.name}" class="w-16 h-16 object-cover rounded-lg">` : 
+                            '<div class="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center"><i class="fas fa-image text-gray-400"></i></div>'
+                        }
+                        <div>
+                            <h3 class="font-semibold text-lg">${category.name}</h3>
+                            <p class="text-gray-600">${category.description || 'Sin descripción'}</p>
+                        </div>
+                    </div>
+                    <div class="space-x-2">
+                        <button onclick="editCategory(${category.id})" class="text-blue-500 hover:text-blue-700 p-2">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="deleteCategory(${category.id})" class="text-red-500 hover:text-red-700 p-2">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showCategoryModal(category = null) {
+            currentEditingId = category ? category.id : null;
+            document.getElementById('categoryModalTitle').textContent = category ? 'Editar Categoría' : 'Agregar Categoría';
+            document.getElementById('categoryName').value = category ? category.name : '';
+            document.getElementById('categoryDescription').value = category ? category.description || '' : '';
+            
+            // Reset image input and preview
+            document.getElementById('categoryImage').value = '';
+            if (category && category.image_url) {
+                document.getElementById('categoryImagePreview').classList.remove('hidden');
+                document.getElementById('categoryPreviewImg').src = category.image_url;
+            } else {
+                document.getElementById('categoryImagePreview').classList.add('hidden');
+            }
+            
+            document.getElementById('categoryModal').classList.remove('hidden');
+            document.getElementById('categoryModal').classList.add('flex');
+        }
+
+        function hideCategoryModal() {
+            document.getElementById('categoryModal').classList.add('hidden');
+            document.getElementById('categoryModal').classList.remove('flex');
+            currentEditingId = null;
+        }
+
+        function editCategory(id) {
+            const category = categories.find(c => c.id === id);
+            if (category) {
+                showCategoryModal(category);
+            }
+        }
+
+        function deleteCategory(id) {
+            if (NotificationService.confirm('Esta acción no se puede deshacer. Los productos asociados quedarán sin categoría.', '¿Eliminar categoría?')) {
+                    fetch(`${API_BASE}/admin/categories/${id}`, {
+                        method: 'DELETE',
+                        headers: getAuthHeaders()
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.message) {
+                            loadCategories();
+                            NotificationService.showDeleted('La categoría');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error deleting category:', error);
+                        NotificationService.error('No se pudo eliminar la categoría.');
+                    });
+            }
+        }
+
+        function handleCategorySubmit(e) {
+            e.preventDefault();
+            const formData = new FormData();
+            formData.append('name', document.getElementById('categoryName').value);
+            formData.append('description', document.getElementById('categoryDescription').value);
+            
+            const imageFile = document.getElementById('categoryImage').files[0];
+            if (imageFile) {
+                formData.append('image', imageFile);
+            }
+            
+            const url = currentEditingId ? `${API_BASE}/admin/categories/${currentEditingId}` : `${API_BASE}/admin/categories`;
+            const method = currentEditingId ? 'PUT' : 'POST';
+            
+            fetch(url, {
+                method: method,
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token') || localStorage.getItem('authToken')}`
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message || data.id) {
+                    loadCategories();
+                    hideCategoryModal();
+                    toastr.success(currentEditingId ? 'Categoría actualizada exitosamente' : 'Categoría creada exitosamente', '¡Éxito!');
+                } else {
+                    toastr.error(data.error || 'Error desconocido', 'Error');
+                }
+            })
+            .catch(error => {
+                console.error('Error saving category:', error);
+                toastr.error('Error al guardar la categoría', 'Error');
+            });
+        }
+
+        // Subcategories functions
+        function loadSubcategories() {
+            if (isLoading.subcategories) {
+                console.log('Already loading subcategories, skipping...');
+                return;
+            }
+            
+            isLoading.subcategories = true;
+            
+            fetch(`${API_BASE}/admin/subcategories`, {
+                headers: getAuthHeaders()
+            })
+            .then(response => response.json())
+            .then(data => {
+                subcategories = data;
+                renderSubcategories();
+                isLoading.subcategories = false;
+            })
+            .catch(error => {
+                console.error('Error loading subcategories:', error);
+                isLoading.subcategories = false;
+            });
+        }
+
+        function renderSubcategories() {
+            const container = document.getElementById('subcategoriesList');
+            container.innerHTML = subcategories.map(subcategory => `
+                <div class="border rounded-lg p-4 flex justify-between items-center hover:shadow-lg transition-shadow">
+                    <div class="flex items-center space-x-4">
+                        ${subcategory.image_url ? 
+                            `<img src="${subcategory.image_url}" alt="${subcategory.name}" class="w-16 h-16 object-cover rounded-lg">` : 
+                            '<div class="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center"><i class="fas fa-folder-open text-gray-400"></i></div>'
+                        }
+                        <div>
+                            <h3 class="font-semibold text-lg">${subcategory.name}</h3>
+                            <p class="text-indigo-600 font-medium">${subcategory.category_name || 'Sin categoría'}</p>
+                            <p class="text-gray-500 text-sm">${subcategory.description || 'Sin descripción'}</p>
+                        </div>
+                    </div>
+                    <div class="space-x-2">
+                        <button onclick="editSubcategory(${subcategory.id})" class="text-blue-500 hover:text-blue-700 p-2">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="deleteSubcategory(${subcategory.id})" class="text-red-500 hover:text-red-700 p-2">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showSubcategoryModal(subcategory = null) {
+            // Ensure categories are loaded first
+            if (categories.length === 0) {
+                loadCategories();
+                toastr.info('Por favor intente nuevamente en un momento.', 'Cargando categorías...');
+                return;
+            }
+            
+            currentEditingId = subcategory ? subcategory.id : null;
+            document.getElementById('subcategoryModalTitle').textContent = subcategory ? 'Editar Subcategoría' : 'Agregar Subcategoría';
+            document.getElementById('subcategoryName').value = subcategory ? subcategory.name : '';
+            document.getElementById('subcategoryDescription').value = subcategory ? subcategory.description || '' : '';
+            
+            // Update category select before setting value
+            updateCategorySelects();
+            document.getElementById('subcategoryCategory').value = subcategory ? subcategory.category_id : '';
+            
+            // Reset image input and preview
+            document.getElementById('subcategoryImage').value = '';
+            if (subcategory && subcategory.image_url) {
+                document.getElementById('subcategoryImagePreview').classList.remove('hidden');
+                document.getElementById('subcategoryPreviewImg').src = subcategory.image_url;
+            } else {
+                document.getElementById('subcategoryImagePreview').classList.add('hidden');
+            }
+            
+            document.getElementById('subcategoryModal').classList.remove('hidden');
+            document.getElementById('subcategoryModal').classList.add('flex');
+        }
+
+        function hideSubcategoryModal() {
+            document.getElementById('subcategoryModal').classList.add('hidden');
+            document.getElementById('subcategoryModal').classList.remove('flex');
+            currentEditingId = null;
+        }
+
+        function editSubcategory(id) {
+            const subcategory = subcategories.find(s => s.id === id);
+            if (subcategory) {
+                showSubcategoryModal(subcategory);
+            }
+        }
+
+        function deleteSubcategory(id) {
+            if (NotificationService.confirm('Esta acción no se puede deshacer. Los productos asociados quedarán sin subcategoría.', '¿Eliminar subcategoría?')) {
+                    fetch(`${API_BASE}/admin/subcategories/${id}`, {
+                        method: 'DELETE',
+                        headers: getAuthHeaders()
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.message) {
+                            loadSubcategories();
+                            NotificationService.showDeleted('La subcategoría');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error deleting subcategory:', error);
+                        NotificationService.error('No se pudo eliminar la subcategoría.');
+                    });
+            }
+        }
+
+        function handleSubcategorySubmit(e) {
+            e.preventDefault();
+            const formData = new FormData();
+            const name = document.getElementById('subcategoryName').value;
+            const description = document.getElementById('subcategoryDescription').value;
+            const category_id = document.getElementById('subcategoryCategory').value;
+            
+            console.log('Sending subcategory data:', { name, description, category_id });
+            
+            formData.append('name', name);
+            formData.append('description', description);
+            formData.append('category_id', category_id);
+            
+            const imageFile = document.getElementById('subcategoryImage').files[0];
+            if (imageFile) {
+                formData.append('image', imageFile);
+            }
+            
+            const url = currentEditingId ? `${API_BASE}/admin/subcategories/${currentEditingId}` : `${API_BASE}/admin/subcategories`;
+            const method = currentEditingId ? 'PUT' : 'POST';
+            
+            fetch(url, {
+                method: method,
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token') || localStorage.getItem('authToken')}`
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message || data.id) {
+                    loadSubcategories();
+                    hideSubcategoryModal();
+                    toastr.success(currentEditingId ? 'Subcategoría actualizada exitosamente' : 'Subcategoría creada exitosamente', '¡Éxito!');
+                } else {
+                    toastr.error(data.error || 'Error desconocido', 'Error');
+                }
+            })
+            .catch(error => {
+                console.error('Error saving subcategory:', error);
+                toastr.error('Error al guardar la subcategoría', 'Error');
+            });
+        }
+
+        // Products functions
+        function loadProducts() {
+            if (isLoading.products) {
+                console.log('Already loading products, skipping...');
+                return;
+            }
+            
+            isLoading.products = true;
+            
+            fetch(`${API_BASE}/admin/products`, {
+                headers: getAuthHeaders()
+            })
+            .then(response => response.json())
+            .then(data => {
+                products = data;
+                renderProducts();
+                isLoading.products = false;
+            })
+            .catch(error => {
+                console.error('Error loading products:', error);
+                isLoading.products = false;
+            });
+        }
+
+        function renderProducts() {
+            const container = document.getElementById('productsList');
+            container.innerHTML = products.map(product => {
+                // Convertir is_featured a booleano de forma segura
+                const isFeatured = product.is_featured == 1 || product.is_featured === true || product.is_featured === 'true' || product.is_featured === '1';
+                
+                return `
+                <div class="border rounded-lg p-4 flex justify-between items-center">
+                    <div class="flex items-center space-x-4">
+                        ${product.image_url ? `<img src="${product.image_url}" alt="${product.name}" class="w-16 h-16 object-cover rounded">` : '<div class="w-16 h-16 bg-gray-200 rounded flex items-center justify-center"><i class="fas fa-image text-gray-400"></i></div>'}
+                        <div>
+                            <h3 class="font-semibold">${product.name}</h3>
+                            <p class="text-gray-600">${product.category_name || 'Sin categoría'} ${product.subcategory_name ? `> ${product.subcategory_name}` : ''}</p>
+                            <p class="text-green-600 font-bold">$${product.price}</p>
+                            <p class="text-sm text-gray-500">Stock: ${product.stock_quantity} | Estado: ${product.is_active ? 'Activo' : 'Inactivo'}</p>
+                        </div>
+                    </div>
+                    <div class="space-x-2 flex items-center">
+                        <button onclick="toggleFeatured(${product.id}, ${isFeatured})" 
+                                class="p-2 rounded-lg transition-all ${isFeatured ? 'bg-yellow-100 text-yellow-500 hover:bg-yellow-200' : 'bg-gray-100 text-gray-300 hover:bg-gray-200'}" 
+                                title="${isFeatured ? 'Quitar de destacados' : 'Marcar como destacado'}">
+                            <i class="${isFeatured ? 'fas fa-star' : 'far fa-star'} text-xl"></i>
+                        </button>
+                        <button onclick="editProduct(${product.id})" class="p-2 text-blue-500 hover:text-blue-700 hover:bg-blue-100 rounded-lg transition-all">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="deleteProduct(${product.id})" class="p-2 text-red-500 hover:text-red-700 hover:bg-red-100 rounded-lg transition-all">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            }).join('');
+        }
+
+        function showProductModal(product = null) {
+            currentEditingId = product ? product.id : null;
+            document.getElementById('productModalTitle').textContent = product ? 'Editar Producto' : 'Agregar Producto';
+            
+            if (product) {
+                document.getElementById('productName').value = product.name;
+                document.getElementById('productPrice').value = product.price;
+                document.getElementById('productCategory').value = product.category_id || '';
+                document.getElementById('productSubcategory').value = product.subcategory_id || '';
+                document.getElementById('productStock').value = product.stock_quantity;
+                document.getElementById('productActive').value = product.is_active.toString();
+                document.getElementById('productDescription').value = product.description || '';
+                document.getElementById('productFeatured').checked = product.is_featured || false;
+                
+                if (product.image_url) {
+                    document.getElementById('imagePreview').classList.remove('hidden');
+                    document.getElementById('previewImg').src = `${API_BASE.replace('/api', '')}${product.image_url}`;
+                }
+            } else {
+                document.getElementById('productForm').reset();
+                document.getElementById('productFeatured').checked = false;
+                document.getElementById('imagePreview').classList.add('hidden');
+            }
+            
+            document.getElementById('productModal').classList.remove('hidden');
+            document.getElementById('productModal').classList.add('flex');
+        }
+
+        function hideProductModal() {
+            document.getElementById('productModal').classList.add('hidden');
+            document.getElementById('productModal').classList.remove('flex');
+            currentEditingId = null;
+        }
+
+        function editProduct(id) {
+            const product = products.find(p => p.id === id);
+            if (product) {
+                showProductModal(product);
+            }
+        }
+
+        function deleteProduct(id) {
+            if (NotificationService.confirmDelete('producto')) {
+                    fetch(`${API_BASE}/admin/products/${id}`, {
+                        method: 'DELETE',
+                        headers: getAuthHeaders()
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.message) {
+                            loadProducts();
+                            NotificationService.showDeleted('El producto');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error deleting product:', error);
+                        NotificationService.error('No se pudo eliminar el producto.');
+                    });
+            }
+        }
+
+        function toggleFeatured(productId, currentFeaturedStatus) {
+            console.log(`Toggle featured: productId=${productId}, currentStatus=${currentFeaturedStatus}`);
+            // Si está destacado (true), lo cambiamos a false, y viceversa
+            const newFeaturedStatus = !currentFeaturedStatus;
+            console.log(`Will set is_featured to: ${newFeaturedStatus}`);
+            
+            fetch(`${API_BASE}/products/${productId}/featured`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('authToken')}`
+                },
+                body: JSON.stringify({
+                    is_featured: newFeaturedStatus
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    loadProducts(); // Reload the products to show updated status
+                    toastr.success(newFeaturedStatus ? 'Agregado a Destacados' : 'Eliminado de Destacados', '¡Actualizado!');
+                } else {
+                    toastr.error('No se pudo actualizar el estado del producto.', 'Error');
+                }
+            })
+            .catch(error => {
+                console.error('Error updating featured status:', error);
+                toastr.error('No se pudo actualizar el estado del producto.', 'Error');
+            });
+        }
+
+        function handleProductSubmit(e) {
+            e.preventDefault();
+            const formData = new FormData();
+            
+            formData.append('name', document.getElementById('productName').value);
+            formData.append('price', document.getElementById('productPrice').value);
+            formData.append('category_id', document.getElementById('productCategory').value);
+            formData.append('subcategory_id', document.getElementById('productSubcategory').value);
+            formData.append('stock_quantity', document.getElementById('productStock').value);
+            formData.append('is_active', document.getElementById('productActive').value);
+            formData.append('description', document.getElementById('productDescription').value);
+            formData.append('is_featured', document.getElementById('productFeatured').checked);
+            
+            const imageFile = document.getElementById('productImage').files[0];
+            if (imageFile) {
+                formData.append('image', imageFile);
+            }
+            
+            const url = currentEditingId ? `${API_BASE}/admin/products/${currentEditingId}` : `${API_BASE}/admin/products`;
+            const method = currentEditingId ? 'PUT' : 'POST';
+            
+            fetch(url, {
+                method: method,
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message || data.id) {
+                    loadProducts();
+                    hideProductModal();
+                    NotificationService.showSaved('Producto', currentEditingId);
+                } else {
+                    toastr.error(data.error || 'Error desconocido', 'Error');
+                }
+            })
+            .catch(error => {
+                console.error('Error saving product:', error);
+                NotificationService.error('Error al guardar el producto');
+            });
+        }
+
+        function handleCategoryChange() {
+            const categoryId = document.getElementById('productCategory').value;
+            const subcategorySelect = document.getElementById('productSubcategory');
+            
+            subcategorySelect.innerHTML = '<option value="">Seleccionar subcategoría</option>';
+            
+            if (categoryId) {
+                fetch(`${API_BASE}/admin/subcategories/by-category/${categoryId}`, {
+                    headers: getAuthHeaders()
+                })
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(subcategory => {
+                        const option = document.createElement('option');
+                        option.value = subcategory.id;
+                        option.textContent = subcategory.name;
+                        subcategorySelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error loading subcategories:', error));
+            }
+        }
+
+        function handleImagePreview(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('imagePreview').classList.remove('hidden');
+                    document.getElementById('previewImg').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function handleCategoryImagePreview(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('categoryImagePreview').classList.remove('hidden');
+                    document.getElementById('categoryPreviewImg').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function handleSubcategoryImagePreview(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('subcategoryImagePreview').classList.remove('hidden');
+                    document.getElementById('subcategoryPreviewImg').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function updateCategorySelects() {
+            const selects = ['subcategoryCategory', 'productCategory'];
+            selects.forEach(selectId => {
+                const select = document.getElementById(selectId);
+                const currentValue = select.value;
+                select.innerHTML = '<option value="">Seleccionar categoría</option>';
+                
+                categories.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category.id;
+                    option.textContent = category.name;
+                    select.appendChild(option);
+                });
+                
+                if (currentValue) {
+                    select.value = currentValue;
+                }
+            });
+            console.log('Categories loaded in selects:', categories.length);
+        }
+    </script>
+</body>
+</html>
