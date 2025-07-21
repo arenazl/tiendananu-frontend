@@ -1,0 +1,12 @@
+{
+  "name": "ecommerce-frontend",
+  "version": "1.0.0",
+  "description": "Frontend para aplicación e-commerce con Tailwind CSS",
+  "main": "index.html",
+  "scripts": {
+    "serve": "npx http-server -p 8000"
+  },
+  "keywords": ["ecommerce", "tailwind", "frontend"],
+  "author": "",
+  "license": "ISC"
+}

@@ -1,0 +1,15 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Mac files
+.DS_Store
+
+# IDE
+.idea
+.vscode
+
+# Config files with sensitive data
+config.local.js
+config.dev.js

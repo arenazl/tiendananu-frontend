@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Admin Access</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-8">Test de Acceso Admin</h1>
+        
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">1. Verificar Tokens</h2>
+            <div id="tokenInfo" class="font-mono text-sm"></div>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">2. Verificar Usuario</h2>
+            <button onclick="checkUser()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                Verificar Usuario Actual
+            </button>
+            <div id="userInfo" class="mt-4 font-mono text-sm"></div>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">3. Login como Admin</h2>
+            <button onclick="loginAsAdmin()" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                Login como admin@admin.com
+            </button>
+            <div id="loginResult" class="mt-4 font-mono text-sm"></div>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-xl font-semibold mb-4">4. Acciones</h2>
+            <div class="space-x-4">
+                <button onclick="clearTokens()" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
+                    Limpiar Tokens
+                </button>
+                <button onclick="goToAdmin()" class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600">
+                    Ir a Admin Panel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000/api';
+        
+        // Check tokens on load
+        window.onload = function() {
+            checkTokens();
+        };
+        
+        function checkTokens() {
+            const token = localStorage.getItem('token');
+            const adminToken = localStorage.getItem('adminToken');
+            
+            let html = '<p class="mb-2">Token: ' + (token ? '✅ Presente' : '❌ No encontrado') + '</p>';
+            html += '<p>AdminToken: ' + (adminToken ? '✅ Presente' : '❌ No encontrado') + '</p>';
+            
+            document.getElementById('tokenInfo').innerHTML = html;
+        }
+        
+        async function checkUser() {
+            const token = localStorage.getItem('adminToken') || localStorage.getItem('token');
+            
+            if (!token) {
+                document.getElementById('userInfo').innerHTML = '<p class="text-red-500">No hay token disponible</p>';
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/auth/me`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById('userInfo').innerHTML = `
+                        <p class="text-green-500 mb-2">✅ Usuario autenticado</p>
+                        <pre class="bg-gray-100 p-2 rounded overflow-auto">${JSON.stringify(data.user, null, 2)}</pre>
+                    `;
+                } else {
+                    document.getElementById('userInfo').innerHTML = `
+                        <p class="text-red-500">❌ Error: ${data.error || 'Unknown error'}</p>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('userInfo').innerHTML = `
+                    <p class="text-red-500">❌ Error de conexión: ${error.message}</p>
+                `;
+            }
+        }
+        
+        async function loginAsAdmin() {
+            try {
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: 'admin@admin.com',
+                        password: 'admin'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.token) {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('adminToken', data.token);
+                    
+                    document.getElementById('loginResult').innerHTML = `
+                        <p class="text-green-500 mb-2">✅ Login exitoso</p>
+                        <pre class="bg-gray-100 p-2 rounded overflow-auto">${JSON.stringify(data.user, null, 2)}</pre>
+                    `;
+                    
+                    checkTokens();
+                } else {
+                    document.getElementById('loginResult').innerHTML = `
+                        <p class="text-red-500">❌ Error: ${data.error || 'Login failed'}</p>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('loginResult').innerHTML = `
+                    <p class="text-red-500">❌ Error de conexión: ${error.message}</p>
+                `;
+            }
+        }
+        
+        function clearTokens() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('adminToken');
+            checkTokens();
+            alert('Tokens eliminados');
+        }
+        
+        function goToAdmin() {
+            window.location.href = 'admin.html';
+        }
+    </script>
+</body>
+</html>

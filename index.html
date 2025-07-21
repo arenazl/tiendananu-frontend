@@ -1,0 +1,2780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TiendaNanuAjuares - Ropa de Bebé con Amor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Sign-In -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <style>
+        .fade-in { animation: fadeIn 0.3s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .slide-in { animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+        .bounce { animation: bounce 0.5s; }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Modern Category Styles */
+        .category-btn {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        .category-btn::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 3px;
+            background: #ec4899;
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+        .category-btn:hover::after,
+        .category-btn.active::after {
+            width: 100%;
+        }
+        .category-btn.active {
+            color: #ec4899;
+            font-weight: 600;
+        }
+        .subcategory-chip {
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+        }
+        .subcategory-chip:hover {
+            border-color: #ec4899;
+            transform: translateY(-2px);
+        }
+        .category-card {
+            transition: all 0.3s ease;
+        }
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(236, 72, 153, 0.2);
+        }
+        .category-card-nav {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .category-card-nav:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .subcategory-card {
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        .subcategory-card:hover {
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .mega-menu-item {
+            transition: all 0.2s ease;
+        }
+        .mega-menu-item:hover {
+            transform: translateX(8px);
+            color: #ec4899;
+        }
+        .product-preview {
+            transition: all 0.3s ease;
+        }
+        .product-preview:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        /* Carousel Styles */
+        .carousel-slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+        .carousel-slide.active {
+            opacity: 1;
+        }
+        .carousel-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .carousel-dot.active {
+            background: white;
+            transform: scale(1.2);
+        }
+        .hero-gradient {
+            background: linear-gradient(135deg, rgba(236, 72, 153, 0.1) 0%, rgba(239, 68, 68, 0.1) 100%);
+        }
+    </style>
+</head>
+<body class="bg-gray-50/50">
+    <!-- Header -->
+    <header class="bg-white shadow-md sticky top-0 z-30">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <h1 class="text-2xl font-bold text-pink-600 cursor-pointer" onclick="showHome()">
+                    <i class="fas fa-baby mr-2"></i>TiendaNanuAjuares
+                </h1>
+                <div class="flex items-center space-x-4">
+                    <div class="relative">
+                        <input type="text" placeholder="Buscar ropa de bebé..." 
+                               class="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:border-pink-500">
+                        <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                    </div>
+                    <div id="authButtons" class="flex items-center space-x-3">
+                        <button onclick="showLogin()" class="px-4 py-2 text-indigo-600 hover:text-indigo-800">
+                            Login
+                        </button>
+                        <button onclick="showRegister()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+                            Register
+                        </button>
+                    </div>
+                    <div id="userMenu" class="hidden relative">
+                        <button onclick="toggleUserDropdown()" class="flex items-center space-x-2 text-gray-700 hover:text-indigo-600">
+                            <i class="fas fa-user-circle text-2xl"></i>
+                            <span id="userName"></span>
+                        </button>
+                        <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg">
+                            <a href="#" onclick="showProfile()" class="block px-4 py-2 hover:bg-gray-100">Profile</a>
+                            <a href="#" onclick="showOrders()" class="block px-4 py-2 hover:bg-gray-100">My Orders</a>
+                            <a href="#" onclick="openAdminPanel()" id="adminLink" class="hidden block px-4 py-2 hover:bg-gray-100 text-purple-600">
+                                <i class="fas fa-cog mr-2"></i>Admin Panel
+                            </a>
+                            <hr class="my-1">
+                            <a href="#" onclick="logout()" class="block px-4 py-2 hover:bg-gray-100 text-red-600">Logout</a>
+                        </div>
+                    </div>
+                    <button onclick="toggleCart()" class="relative p-2 text-gray-700 hover:text-indigo-600">
+                        <i class="fas fa-shopping-cart text-xl"></i>
+                        <span id="cartCount" class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">0</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Innovative Two-Level Categories Navigation -->
+    <nav id="categoriesBar" class="bg-white sticky top-16 z-20 shadow-md border-t border-gray-100">
+        <!-- Main Categories Level -->
+        <div class="border-b border-pink-100">
+            <div class="container mx-auto px-4">
+                <div class="flex items-center justify-between">
+                    <div id="mainCategoriesMenu" class="flex space-x-1 py-3 overflow-x-auto scrollbar-hide">
+                        <!-- Main categories will be loaded here -->
+                    </div>
+                    <button onclick="toggleAllCategories()" class="text-pink-600 hover:text-pink-800 px-4 py-2 rounded-lg hover:bg-pink-50 transition-all">
+                        <i class="fas fa-th mr-2"></i>Ver Todo
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Subcategories Level (Dynamic based on selected category) -->
+        <div id="subcategoriesBar" class="bg-white border-b border-gray-200 transition-all duration-300 overflow-hidden" style="height: 0;">
+            <div class="container mx-auto px-4">
+                <div id="subcategoriesMenu" class="flex items-center space-x-4 py-3 overflow-x-auto scrollbar-hide">
+                    <!-- Subcategories will be loaded here -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- All Categories Grid (Hidden by default) -->
+        <div id="allCategoriesGrid" class="absolute left-0 right-0 bg-white shadow-2xl hidden opacity-0 transition-all duration-300 transform -translate-y-4">
+            <div class="container mx-auto px-4 py-8">
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+                    <!-- All categories grid will be inserted here -->
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Carousel -->
+    <section id="heroCarousel" class="relative w-full h-96 md:h-[500px] overflow-hidden bg-gray-100">
+        <div class="carousel-container relative w-full h-full">
+            <!-- Slides will be inserted here -->
+            <div id="carouselSlides" class="relative w-full h-full">
+                <!-- Loading placeholder -->
+                <div class="flex items-center justify-center h-full">
+                    <div class="text-center">
+                        <i class="fas fa-spinner fa-spin text-4xl text-pink-500 mb-4"></i>
+                        <p class="text-gray-600">Cargando productos destacados...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Navigation Arrows -->
+            <button id="prevSlide" class="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-3 rounded-full shadow-lg transition-all opacity-0">
+                <i class="fas fa-chevron-left text-xl"></i>
+            </button>
+            <button id="nextSlide" class="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-3 rounded-full shadow-lg transition-all opacity-0">
+                <i class="fas fa-chevron-right text-xl"></i>
+            </button>
+            
+            <!-- Dots Indicator -->
+            <div id="carouselDots" class="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2">
+                <!-- Dots will be inserted here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main id="mainContent" class="container mx-auto px-4 py-8">
+        <!-- Loading spinner -->
+        <div id="loadingSpinner" class="hidden fixed inset-0 backdrop-blur-sm bg-black/20 flex items-center justify-center z-50">
+            <div class="bg-white rounded-full p-4 shadow-xl">
+                <div class="loader w-12 h-12 border-4 border-pink-200 border-t-pink-600 rounded-full animate-spin"></div>
+            </div>
+        </div>
+
+        <!-- Home/Products View -->
+        <div id="homeView">
+            <!-- Hero Section with Modern Style -->
+            <div class="bg-gradient-to-br from-pink-50 to-purple-50 rounded-3xl p-12 mb-12 relative overflow-hidden">
+                <div class="relative z-10">
+                    <h1 class="text-5xl font-bold text-gray-900 mb-4">
+                        ENCUENTRA LA<br>
+                        <span class="text-pink-600">ROPA PERFECTA</span><br>
+                        PARA TU BEBÉ
+                    </h1>
+                    <p class="text-gray-600 text-lg mb-8">
+                        Explora nuestra colección de ropa de alta calidad para los más pequeños
+                    </p>
+                </div>
+                <div class="absolute top-0 right-0 w-96 h-96 bg-pink-200 rounded-full filter blur-3xl opacity-20"></div>
+                <div class="absolute bottom-0 left-0 w-96 h-96 bg-purple-200 rounded-full filter blur-3xl opacity-20"></div>
+            </div>
+
+
+
+            <!-- Products Section -->
+            <div class="mb-8">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-3xl font-bold text-gray-800">Productos Destacados</h2>
+                    <button class="text-pink-600 hover:text-pink-700 font-semibold">
+                        Ver todos <i class="fas fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+                <div id="productGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    <!-- Products will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Innovative Interactive Menu -->
+            <div id="specialMenu" class="relative my-16 px-4">
+                <!-- Background Effects -->
+                <div class="absolute inset-0 bg-gradient-to-r from-purple-600 via-pink-600 to-red-600 rounded-3xl transform rotate-1 opacity-10"></div>
+                <div class="absolute inset-0 bg-gradient-to-l from-blue-600 via-purple-600 to-pink-600 rounded-3xl transform -rotate-1 opacity-10"></div>
+                
+                <!-- Main Menu Container -->
+                <div class="relative bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 p-8">
+                    <!-- Header -->
+                    <div class="text-center mb-12">
+                        <h2 class="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
+                            Descubre Más
+                        </h2>
+                        <p class="text-gray-600 text-lg">Explora nuestras colecciones especiales</p>
+                    </div>
+
+                    <!-- Interactive Menu Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <!-- Más Vendidos -->
+                        <div class="menu-card group cursor-pointer transform transition-all duration-500 hover:scale-105" onclick="navigateToSpecial('bestsellers')">
+                            <div class="relative bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl p-8 text-white overflow-hidden">
+                                <!-- Background Image -->
+                                <div class="absolute inset-0 opacity-100 group-hover:opacity-100 transition-opacity duration-300">
+                                    <img src="https://images.unsplash.com/photo-1522771930-78848d9293e8?w=400&h=400&fit=crop" 
+                                         alt="Best Selling Baby Clothes" 
+                                         class="w-full h-full object-cover rounded-2xl">
+                                </div>
+                                
+                                <!-- Gradient overlay -->
+                                <div class="absolute inset-0 bg-gradient-to-br from-yellow-400/70 to-orange-500/70 rounded-2xl"></div>
+                                
+                                <!-- Animated background elements -->
+                                <div class="absolute top-0 right-0 w-24 h-24 bg-white/20 rounded-full transform translate-x-8 -translate-y-8 group-hover:scale-150 transition-transform duration-700"></div>
+                                <div class="absolute bottom-0 left-0 w-16 h-16 bg-white/10 rounded-full transform -translate-x-4 translate-y-4 group-hover:scale-125 transition-transform duration-500"></div>
+                                
+                                <!-- Content -->
+                                <div class="relative z-10">
+                                    <div class="flex items-center justify-center w-16 h-16 bg-white/20 rounded-2xl mb-6 group-hover:rotate-12 transition-transform duration-300">
+                                        <i class="fas fa-fire text-2xl"></i>
+                                    </div>
+                                    <h3 class="text-2xl font-bold mb-3">Más Vendidos</h3>
+                                    <p class="text-white/90 mb-4">Los productos favoritos de nuestros clientes</p>
+                                    <div class="flex items-center text-sm font-semibold">
+                                        <span>Explorar</span>
+                                        <i class="fas fa-arrow-right ml-2 group-hover:translate-x-2 transition-transform duration-300"></i>
+                                    </div>
+                                </div>
+                                
+                                <!-- Hover effect overlay -->
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
+                            </div>
+                        </div>
+
+                        <!-- Ofertas -->
+                        <div class="menu-card group cursor-pointer transform transition-all duration-500 hover:scale-105" onclick="navigateToSpecial('onsale')">
+                            <div class="relative bg-gradient-to-br from-red-500 to-pink-600 rounded-2xl p-8 text-white overflow-hidden">
+                                <!-- Background Image -->
+                                <div class="absolute inset-0 opacity-100 group-hover:opacity-100 transition-opacity duration-300">
+                                    <img src="https://images.unsplash.com/photo-1519689373023-dd07c7988603?w=400&h=400&fit=crop" 
+                                         alt="Baby Clothes Sale" 
+                                         class="w-full h-full object-cover rounded-2xl">
+                                </div>
+                                
+                                <!-- Gradient overlay -->
+                                <div class="absolute inset-0 bg-gradient-to-br from-red-500/70 to-pink-600/70 rounded-2xl"></div>
+                                
+                                <!-- Animated background elements -->
+                                <div class="absolute top-0 left-0 w-20 h-20 bg-white/20 rounded-full transform -translate-x-6 -translate-y-6 group-hover:scale-150 transition-transform duration-700"></div>
+                                <div class="absolute bottom-0 right-0 w-12 h-12 bg-white/10 rounded-full transform translate-x-3 translate-y-3 group-hover:scale-125 transition-transform duration-500"></div>
+                                
+                                <!-- Content -->
+                                <div class="relative z-10">
+                                    <div class="flex items-center justify-center w-16 h-16 bg-white/20 rounded-2xl mb-6 group-hover:rotate-12 transition-transform duration-300">
+                                        <i class="fas fa-tags text-2xl"></i>
+                                    </div>
+                                    <h3 class="text-2xl font-bold mb-3">Ofertas</h3>
+                                    <p class="text-white/90 mb-4">Descuentos increíbles por tiempo limitado</p>
+                                    <div class="flex items-center text-sm font-semibold">
+                                        <span>Ver ofertas</span>
+                                        <i class="fas fa-arrow-right ml-2 group-hover:translate-x-2 transition-transform duration-300"></i>
+                                    </div>
+                                </div>
+                                
+                                <!-- Sale badge -->
+                                <div class="absolute top-4 right-4 bg-yellow-400 text-red-600 font-bold text-xs px-2 py-1 rounded-full animate-pulse">
+                                    SALE
+                                </div>
+                                
+                                <!-- Hover effect overlay -->
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
+                            </div>
+                        </div>
+
+                        <!-- Trending -->
+                        <div class="menu-card group cursor-pointer transform transition-all duration-500 hover:scale-105" onclick="navigateToSpecial('trending')">
+                            <div class="relative bg-gradient-to-br from-purple-600 to-blue-600 rounded-2xl p-8 text-white overflow-hidden">
+                                <!-- Background Image -->
+                                <div class="absolute inset-0 opacity-100 group-hover:opacity-100 transition-opacity duration-300">
+                                    <img src="https://images.unsplash.com/photo-1519689680058-324335c77eba?w=400&h=400&fit=crop" 
+                                         alt="Trending Baby Fashion" 
+                                         class="w-full h-full object-cover rounded-2xl">
+                                </div>
+                                
+                                <!-- Gradient overlay -->
+                                <div class="absolute inset-0 bg-gradient-to-br from-purple-600/70 to-blue-600/70 rounded-2xl"></div>
+                                
+                                <!-- Animated background elements -->
+                                <div class="absolute top-0 right-0 w-18 h-18 bg-white/20 rounded-full transform translate-x-4 -translate-y-4 group-hover:scale-150 transition-transform duration-700"></div>
+                                <div class="absolute bottom-0 left-0 w-14 h-14 bg-white/10 rounded-full transform -translate-x-2 translate-y-2 group-hover:scale-125 transition-transform duration-500"></div>
+                                
+                                <!-- Content -->
+                                <div class="relative z-10">
+                                    <div class="flex items-center justify-center w-16 h-16 bg-white/20 rounded-2xl mb-6 group-hover:rotate-12 transition-transform duration-300">
+                                        <i class="fas fa-trending-up text-2xl"></i>
+                                    </div>
+                                    <h3 class="text-2xl font-bold mb-3">Trending</h3>
+                                    <p class="text-white/90 mb-4">Lo que está de moda ahora mismo</p>
+                                    <div class="flex items-center text-sm font-semibold">
+                                        <span>Ver trending</span>
+                                        <i class="fas fa-arrow-right ml-2 group-hover:translate-x-2 transition-transform duration-300"></i>
+                                    </div>
+                                </div>
+                                
+                                <!-- Trending indicator -->
+                                <div class="absolute top-4 right-4 flex items-center space-x-1">
+                                    <div class="w-2 h-2 bg-green-400 rounded-full animate-ping"></div>
+                                    <div class="w-2 h-2 bg-green-400 rounded-full animate-ping" style="animation-delay: 0.2s"></div>
+                                    <div class="w-2 h-2 bg-green-400 rounded-full animate-ping" style="animation-delay: 0.4s"></div>
+                                </div>
+                                
+                                <!-- Hover effect overlay -->
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Floating particles animation -->
+                    <div class="absolute inset-0 pointer-events-none">
+                        <div class="absolute top-10 left-10 w-2 h-2 bg-purple-400/30 rounded-full animate-bounce" style="animation-delay: 0s; animation-duration: 3s;"></div>
+                        <div class="absolute top-20 right-20 w-1 h-1 bg-pink-400/40 rounded-full animate-bounce" style="animation-delay: 1s; animation-duration: 4s;"></div>
+                        <div class="absolute bottom-16 left-1/4 w-1.5 h-1.5 bg-blue-400/35 rounded-full animate-bounce" style="animation-delay: 2s; animation-duration: 5s;"></div>
+                        <div class="absolute bottom-32 right-1/3 w-1 h-1 bg-yellow-400/40 rounded-full animate-bounce" style="animation-delay: 0.5s; animation-duration: 3.5s;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Login View -->
+        <div id="loginView" class="hidden min-h-[60vh] flex items-center justify-center">
+            <div class="max-w-md w-full bg-white p-8 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold mb-6">Login</h2>
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Email</label>
+                    <input type="email" name="email" required class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-indigo-500">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-700 mb-2">Password</label>
+                    <input type="password" name="password" required class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-indigo-500">
+                </div>
+                <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700">
+                    Login
+                </button>
+            </form>
+            
+            <div class="my-6 flex items-center">
+                <div class="flex-1 border-t border-gray-300"></div>
+                <span class="px-4 text-gray-500">OR</span>
+                <div class="flex-1 border-t border-gray-300"></div>
+            </div>
+            
+            <!-- Google Sign-In Button -->
+            <div id="googleSignInButton" class="flex justify-center"></div>
+            
+            <p class="mt-4 text-center text-gray-600">
+                Don't have an account? <a href="#" onclick="showRegister()" class="text-indigo-600 hover:underline">Register</a>
+            </p>
+            </div>
+        </div>
+
+        <!-- Register View -->
+        <div id="registerView" class="hidden min-h-[60vh] flex items-center justify-center">
+            <div class="max-w-md w-full bg-white p-8 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold mb-6">Register</h2>
+            <form id="registerForm" onsubmit="handleRegister(event)">
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Email</label>
+                    <input type="email" name="email" required class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-indigo-500">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Password</label>
+                    <input type="password" name="password" required minlength="6" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-indigo-500">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">First Name</label>
+                    <input type="text" name="first_name" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-indigo-500">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-700 mb-2">Last Name</label>
+                    <input type="text" name="last_name" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-indigo-500">
+                </div>
+                <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700">
+                    Register
+                </button>
+            </form>
+            
+            <div class="my-6 flex items-center">
+                <div class="flex-1 border-t border-gray-300"></div>
+                <span class="px-4 text-gray-500">OR</span>
+                <div class="flex-1 border-t border-gray-300"></div>
+            </div>
+            
+            <!-- Google Sign-In Button for Register -->
+            <div id="googleSignInButtonRegister" class="flex justify-center"></div>
+            
+            <p class="mt-4 text-center text-gray-600">
+                Already have an account? <a href="#" onclick="showLogin()" class="text-indigo-600 hover:underline">Login</a>
+            </p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Cart Sidebar -->
+    <div id="cartSidebar" class="fixed right-0 top-0 h-full w-96 bg-white shadow-xl transform translate-x-full transition-transform duration-300 z-40 flex flex-col">
+        <div class="p-6 border-b">
+            <div class="flex justify-between items-center">
+                <h2 class="text-2xl font-bold">Carrito</h2>
+                <button onclick="toggleCart()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+        </div>
+        <div id="cartContent" class="flex-1 overflow-y-auto overflow-x-hidden p-6">
+            <!-- Cart items will be displayed here -->
+        </div>
+        <div id="cartSummary" class="mt-auto border-t p-6 bg-gray-50">
+            <!-- Cart summary will be displayed here -->
+        </div>
+    </div>
+
+    <!-- Cart Overlay -->
+    <div id="cartOverlay" class="fixed inset-0 bg-black bg-opacity-50 hidden z-30" onclick="toggleCart()"></div>
+
+    <!-- Product Detail Sidebar -->
+    <div id="productDetailSidebar" class="fixed right-0 top-0 h-full w-[500px] bg-white shadow-xl transform translate-x-full transition-transform duration-300 z-40">
+        <div class="h-full flex flex-col">
+            <!-- Header -->
+            <div class="p-6 border-b">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-bold">Detalles del Producto</h2>
+                    <button onclick="closeProductDetail()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Content -->
+            <div id="productDetailContent" class="flex-1 overflow-y-auto">
+                <!-- Product details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Detail Overlay -->
+    <div id="productDetailOverlay" class="fixed inset-0 backdrop-blur-sm hidden z-30" onclick="closeProductDetail()"></div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-full transition-transform duration-300">
+        <span id="toastMessage"></span>
+    </div>
+
+    <script src="config.js"></script>
+    <script>
+        // API Configuration loaded from config.js
+        let authToken = localStorage.getItem('authToken');
+        let currentUser = null;
+        
+        // Google OAuth Configuration
+        const GOOGLE_CLIENT_ID = '69784030815-64nkku8kue4mg9sbi602nc074cieg5cn.apps.googleusercontent.com';
+
+        // API Helper Functions
+        async function apiCall(endpoint, options = {}) {
+            const headers = {
+                'Content-Type': 'application/json',
+                ...options.headers
+            };
+
+            if (authToken) {
+                headers['Authorization'] = `Bearer ${authToken}`;
+            }
+
+            try {
+                if (!options.skipLoading) {
+                    showLoading();
+                }
+                const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+                    ...options,
+                    headers
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'API request failed');
+                }
+
+                return data;
+            } catch (error) {
+                console.error('API Error:', error);
+                showToast(error.message, 'error');
+                throw error;
+            } finally {
+                if (!options.skipLoading) {
+                    hideLoading();
+                }
+            }
+        }
+
+        // Loading Functions
+        function showLoading() {
+            document.getElementById('loadingSpinner').classList.remove('hidden');
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingSpinner').classList.add('hidden');
+        }
+
+        // Authentication Functions
+        async function handleLogin(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const credentials = Object.fromEntries(formData);
+
+            try {
+                const response = await apiCall('/auth/login', {
+                    method: 'POST',
+                    body: JSON.stringify(credentials)
+                });
+
+                authToken = response.token;
+                localStorage.setItem('authToken', authToken);
+                currentUser = response.user;
+                
+                updateAuthUI();
+                showHome();
+                showToast('Login successful!');
+                loadCart();
+            } catch (error) {
+                // Error already handled in apiCall
+            }
+        }
+
+        async function handleRegister(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const userData = Object.fromEntries(formData);
+
+            try {
+                const response = await apiCall('/auth/register', {
+                    method: 'POST',
+                    body: JSON.stringify(userData)
+                });
+
+                authToken = response.token;
+                localStorage.setItem('authToken', authToken);
+                currentUser = response.user;
+                
+                updateAuthUI();
+                showHome();
+                showToast('Registration successful!');
+            } catch (error) {
+                // Error already handled in apiCall
+            }
+        }
+
+        async function handleGoogleLogin(response) {
+            try {
+                const result = await apiCall('/auth/google', {
+                    method: 'POST',
+                    body: JSON.stringify({ credential: response.credential })
+                });
+
+                authToken = result.token;
+                localStorage.setItem('authToken', authToken);
+                currentUser = result.user;
+                
+                updateAuthUI();
+                showHome();
+                showToast('Google login successful!');
+                loadCart();
+            } catch (error) {
+                showToast('Google login failed', 'error');
+            }
+        }
+
+        function logout() {
+            // Clear all authentication data
+            authToken = null;
+            currentUser = null;
+            
+            // Clear all localStorage data related to session
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('currentUser');
+            localStorage.removeItem('userEmail');
+            localStorage.removeItem('userName');
+            localStorage.removeItem('userId');
+            localStorage.removeItem('cart');
+            
+            // Clear session storage
+            sessionStorage.clear();
+            
+            // Reset cart
+            cart = [];
+            updateCartUI();
+            
+            // Update UI
+            updateAuthUI();
+            showHome();
+            showToast('Logged out successfully');
+            
+            // Also sign out from Google
+            google.accounts.id.disableAutoSelect();
+        }
+
+        function updateAuthUI() {
+            const authButtons = document.getElementById('authButtons');
+            const userMenu = document.getElementById('userMenu');
+            const userName = document.getElementById('userName');
+            const adminLink = document.getElementById('adminLink');
+
+            if (authToken && currentUser) {
+                authButtons.classList.add('hidden');
+                userMenu.classList.remove('hidden');
+                userName.textContent = currentUser.first_name || currentUser.email;
+                
+                // Show admin link if user is admin
+                if (currentUser.is_admin) {
+                    adminLink.classList.remove('hidden');
+                } else {
+                    adminLink.classList.add('hidden');
+                }
+            } else {
+                authButtons.classList.remove('hidden');
+                userMenu.classList.add('hidden');
+                adminLink.classList.add('hidden');
+            }
+        }
+
+        function toggleUserDropdown() {
+            document.getElementById('userDropdown').classList.toggle('hidden');
+        }
+
+        function openAdminPanel() {
+            // Redirect to admin panel in same window
+            window.location.href = 'admin.html';
+        }
+
+        // Product Functions
+        async function loadProducts() {
+            try {
+                const response = await apiCall('/products?limit=12');
+                const productGrid = document.getElementById('productGrid');
+                
+                productGrid.innerHTML = response.products.map(product => `
+                    <div class="bg-white rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition-all duration-300 hover:shadow-xl">
+                        <img src="${product.image_url}" alt="${product.name}" class="w-full h-48 object-cover">
+                        <div class="p-4">
+                            <h3 class="font-semibold text-gray-800 mb-2">${product.name}</h3>
+                            <p class="text-gray-600 text-sm mb-3">${product.description}</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-xl font-bold text-indigo-600">$${product.price}</span>
+                                <button onclick="addToCart(${product.id})" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors">
+                                    Add to Cart
+                                </button>
+                            </div>
+                            <div class="mt-2">
+                                <span class="text-sm ${product.stock_status === 'In Stock' ? 'text-green-600' : product.stock_status === 'Low Stock' ? 'text-yellow-600' : 'text-red-600'}">
+                                    ${product.stock_status}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                // Error already handled in apiCall
+            }
+        }
+
+        // Cart Functions
+        async function loadCart() {
+            if (!authToken) {
+                updateCartUI([], {
+                    subtotal: '0.00',
+                    tax: '0.00',
+                    shipping: '0.00',
+                    total: '0.00',
+                    item_count: 0
+                });
+                return;
+            }
+
+            try {
+                const response = await apiCall('/cart');
+                updateCartUI(response.items, response.summary);
+            } catch (error) {
+                // Error already handled in apiCall
+            }
+        }
+
+        function updateCartUI(items, summary) {
+            const cartContent = document.getElementById('cartContent');
+            const cartSummary = document.getElementById('cartSummary');
+            const cartCount = document.getElementById('cartCount');
+
+            cartCount.textContent = summary.item_count;
+
+            if (items.length === 0) {
+                cartContent.innerHTML = `
+                    <div class="text-center py-8">
+                        <i class="fas fa-shopping-cart text-6xl text-gray-300 mb-4"></i>
+                        <p class="text-gray-500">Tu carrito está vacío</p>
+                    </div>
+                `;
+                cartSummary.innerHTML = '';
+                return;
+            }
+
+            cartContent.innerHTML = items.map(item => `
+                <div class="flex items-center gap-3 mb-4 p-3 bg-gray-50 rounded-lg">
+                    <img src="${item.image_url}" alt="${item.name}" class="w-16 h-16 object-cover rounded flex-shrink-0">
+                    <div class="flex-1 min-w-0">
+                        <h4 class="font-semibold text-sm truncate">${item.name}</h4>
+                        <p class="text-gray-600">$${item.price}</p>
+                    </div>
+                    <div class="flex items-center gap-1 flex-shrink-0">
+                        <button onclick="updateCartItem(${item.product_id}, ${item.quantity - 1})" class="w-8 h-8 bg-gray-200 rounded hover:bg-gray-300 flex items-center justify-center">
+                            <i class="fas fa-minus text-xs"></i>
+                        </button>
+                        <span class="px-2 min-w-[24px] text-center">${item.quantity}</span>
+                        <button onclick="updateCartItem(${item.product_id}, ${item.quantity + 1})" class="w-8 h-8 bg-gray-200 rounded hover:bg-gray-300 flex items-center justify-center">
+                            <i class="fas fa-plus text-xs"></i>
+                        </button>
+                    </div>
+                    <button onclick="removeFromCart(${item.product_id})" class="text-red-500 hover:text-red-700 flex-shrink-0 ml-2">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            `).join('');
+
+            cartSummary.innerHTML = `
+                <div class="space-y-2 mb-4">
+                    <div class="flex justify-between">
+                        <span>Subtotal:</span>
+                        <span>$${summary.subtotal}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Impuestos:</span>
+                        <span>$${summary.tax}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Envío:</span>
+                        <span>$${summary.shipping}</span>
+                    </div>
+                    <div class="flex justify-between font-bold text-lg">
+                        <span>Total:</span>
+                        <span>$${summary.total}</span>
+                    </div>
+                </div>
+                <button onclick="checkout()" class="w-full bg-pink-600 text-white py-3 rounded-lg hover:bg-pink-700 transition-colors font-semibold">
+                    Ir a Pagar
+                </button>
+            `;
+        }
+
+        async function addToCart(productId) {
+            if (!authToken) {
+                showToast('Por favor inicia sesión para agregar productos al carrito', 'error');
+                showLogin();
+                return;
+            }
+
+            try {
+                await apiCall('/cart/items', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        product_id: productId,
+                        quantity: 1
+                    })
+                });
+
+                showToast('¡Producto agregado al carrito!');
+                loadCart();
+                
+                // Bounce cart icon
+                document.getElementById('cartCount').classList.add('bounce');
+                setTimeout(() => {
+                    document.getElementById('cartCount').classList.remove('bounce');
+                }, 500);
+            } catch (error) {
+                // Error already handled in apiCall
+            }
+        }
+
+        async function updateCartItem(productId, quantity) {
+            try {
+                await apiCall(`/cart/items/${productId}`, {
+                    method: 'PUT',
+                    body: JSON.stringify({ quantity })
+                });
+
+                loadCart();
+            } catch (error) {
+                // Error already handled in apiCall
+            }
+        }
+
+        async function removeFromCart(productId) {
+            try {
+                await apiCall(`/cart/items/${productId}`, {
+                    method: 'DELETE'
+                });
+
+                showToast('Producto eliminado del carrito');
+                loadCart();
+            } catch (error) {
+                // Error already handled in apiCall
+            }
+        }
+
+        async function checkout() {
+            try {
+                const response = await apiCall('/orders', {
+                    method: 'POST',
+                    body: JSON.stringify({})
+                });
+
+                showToast('¡Pedido realizado con éxito!');
+                toggleCart();
+                loadCart();
+                // You could redirect to order confirmation page here
+            } catch (error) {
+                // Error already handled in apiCall
+            }
+        }
+
+        // UI Functions
+        function toggleCart() {
+            const sidebar = document.getElementById('cartSidebar');
+            const overlay = document.getElementById('cartOverlay');
+            
+            sidebar.classList.toggle('translate-x-full');
+            overlay.classList.toggle('hidden');
+            
+            if (!sidebar.classList.contains('translate-x-full')) {
+                loadCart();
+            }
+        }
+
+        // Product Detail Functions
+        let currentProductDetail = null;
+
+        async function showProductDetail(productId) {
+            const sidebar = document.getElementById('productDetailSidebar');
+            const overlay = document.getElementById('productDetailOverlay');
+            const content = document.getElementById('productDetailContent');
+            
+            // Show loading
+            content.innerHTML = `
+                <div class="flex items-center justify-center h-64">
+                    <div class="loader w-12 h-12 border-4 border-pink-200 border-t-pink-600 rounded-full animate-spin"></div>
+                </div>
+            `;
+            
+            // Show sidebar
+            sidebar.classList.remove('translate-x-full');
+            overlay.classList.remove('hidden');
+            
+            try {
+                // Get product details
+                const response = await apiCall(`/products/${productId}`);
+                currentProductDetail = response.product;
+                
+                // Display product details
+                content.innerHTML = `
+                    <div class="p-6">
+                        <!-- Main Image -->
+                        <div class="mb-6">
+                            <img src="${currentProductDetail.image_url}" 
+                                 alt="${currentProductDetail.name}" 
+                                 class="w-full h-96 object-cover rounded-lg shadow-md">
+                        </div>
+                        
+                        <!-- Product Info -->
+                        <div class="space-y-4">
+                            <h3 class="text-3xl font-bold text-gray-800">${currentProductDetail.name}</h3>
+                            
+                            <div class="flex items-center space-x-4">
+                                <span class="text-3xl font-bold text-pink-600">$${currentProductDetail.price}</span>
+                                ${currentProductDetail.stock_quantity < 10 ? 
+                                    `<span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm">
+                                        ¡Solo quedan ${currentProductDetail.stock_quantity} unidades!
+                                    </span>` : 
+                                    `<span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">
+                                        En stock
+                                    </span>`
+                                }
+                            </div>
+                            
+                            <div class="flex items-center space-x-2 text-gray-600">
+                                <i class="fas fa-tag"></i>
+                                <span>${currentProductDetail.category_name || 'Sin categoría'}</span>
+                            </div>
+                            
+                            <div class="border-t pt-4">
+                                <h4 class="font-semibold text-lg mb-2">Descripción</h4>
+                                <p class="text-gray-600 leading-relaxed">${currentProductDetail.description}</p>
+                            </div>
+                            
+                            <!-- Talles disponibles (ejemplo) -->
+                            <div class="border-t pt-4">
+                                <h4 class="font-semibold text-lg mb-3">Talles disponibles</h4>
+                                <div class="flex flex-wrap gap-2">
+                                    ${['RN', '0-3M', '3-6M', '6-12M', '12-18M', '18-24M'].map(size => 
+                                        `<button class="px-4 py-2 border-2 border-gray-300 rounded hover:border-pink-500 hover:text-pink-600 transition-colors">
+                                            ${size}
+                                        </button>`
+                                    ).join('')}
+                                </div>
+                            </div>
+                            
+                            <!-- Add to Cart Button -->
+                            <div class="border-t pt-6 space-y-3">
+                                <button onclick="addToCartFromDetail(${currentProductDetail.id})" 
+                                        class="w-full bg-pink-600 text-white py-3 rounded-lg font-semibold hover:bg-pink-700 transition-colors flex items-center justify-center space-x-2">
+                                    <i class="fas fa-shopping-cart"></i>
+                                    <span>Agregar al Carrito</span>
+                                </button>
+                                
+                                <button onclick="closeProductDetail()" 
+                                        class="w-full bg-gray-200 text-gray-800 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-colors">
+                                    Seguir Comprando
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error loading product details:', error);
+                content.innerHTML = `
+                    <div class="p-6 text-center">
+                        <p class="text-red-600">Error al cargar los detalles del producto</p>
+                        <button onclick="closeProductDetail()" class="mt-4 text-pink-600 hover:underline">
+                            Cerrar
+                        </button>
+                    </div>
+                `;
+            }
+        }
+        
+        function closeProductDetail() {
+            const sidebar = document.getElementById('productDetailSidebar');
+            const overlay = document.getElementById('productDetailOverlay');
+            
+            sidebar.classList.add('translate-x-full');
+            overlay.classList.add('hidden');
+            currentProductDetail = null;
+        }
+        
+        async function addToCartFromDetail(productId) {
+            await addToCart(productId);
+            closeProductDetail();
+        }
+
+        function showHome() {
+            hideAllViews();
+            // Show carousel when returning to home
+            document.getElementById('heroCarousel').classList.remove('hidden');
+            document.getElementById('homeView').classList.remove('hidden');
+            // Show categories bar when returning to home
+            document.getElementById('categoriesBar').classList.remove('hidden');
+            
+            // Restore the original home view content
+            document.getElementById('homeView').innerHTML = `
+                <!-- Hero Section with Modern Style -->
+                <div class="bg-gradient-to-br from-pink-50 to-purple-50 rounded-3xl p-12 mb-12 relative overflow-hidden">
+                    <div class="relative z-10">
+                        <h1 class="text-5xl font-bold text-gray-900 mb-4">
+                            ENCUENTRA LA<br>
+                            <span class="text-pink-600">ROPA PERFECTA</span><br>
+                            PARA TU BEBÉ
+                        </h1>
+                        <p class="text-gray-600 text-lg mb-8">
+                            Explora nuestra colección de ropa de alta calidad para los más pequeños
+                        </p>
+                    </div>
+                    <div class="absolute top-0 right-0 w-96 h-96 bg-pink-200 rounded-full filter blur-3xl opacity-20"></div>
+                    <div class="absolute bottom-0 left-0 w-96 h-96 bg-purple-200 rounded-full filter blur-3xl opacity-20"></div>
+                </div>
+
+                <!-- Products Section -->
+                <div class="mb-8">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-3xl font-bold text-gray-800">Productos Destacados</h2>
+                        <button class="text-pink-600 hover:text-pink-700 font-semibold">
+                            Ver todos <i class="fas fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                    <div id="productGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        <!-- Products will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Innovative Interactive Menu -->
+                <div id="specialMenu" class="relative my-16 px-4">
+                    <!-- Background Effects -->
+                    <div class="absolute inset-0 bg-gradient-to-r from-purple-600 via-pink-600 to-red-600 rounded-3xl transform rotate-1 opacity-10"></div>
+                    <div class="absolute inset-0 bg-gradient-to-l from-blue-600 via-purple-600 to-pink-600 rounded-3xl transform -rotate-1 opacity-10"></div>
+                    
+                    <!-- Main Menu Container -->
+                    <div class="relative bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 p-8">
+                        <!-- Header -->
+                        <div class="text-center mb-12">
+                            <h2 class="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
+                                Descubre Más
+                            </h2>
+                            <p class="text-gray-600 text-lg">Explora nuestras colecciones especiales</p>
+                        </div>
+
+                        <!-- Interactive Menu Cards -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                            <!-- Más Vendidos -->
+                            <div class="menu-card group cursor-pointer transform transition-all duration-500 hover:scale-105" onclick="navigateToSpecial('bestsellers')">
+                                <div class="relative bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl p-8 text-white overflow-hidden">
+                                    <!-- Background Image -->
+                                    <div class="absolute inset-0 opacity-100 group-hover:opacity-100 transition-opacity duration-300">
+                                        <img src="https://images.unsplash.com/photo-1522771930-78848d9293e8?w=400&h=400&fit=crop" 
+                                             alt="Best Selling Baby Clothes" 
+                                             class="w-full h-full object-cover rounded-2xl">
+                                    </div>
+                                    
+                                    <!-- Gradient overlay -->
+                                    <div class="absolute inset-0 bg-gradient-to-br from-yellow-400/70 to-orange-500/70 rounded-2xl"></div>
+                                    
+                                    <!-- Animated background elements -->
+                                    <div class="absolute top-0 right-0 w-24 h-24 bg-white/20 rounded-full transform translate-x-8 -translate-y-8 group-hover:scale-150 transition-transform duration-700"></div>
+                                    <div class="absolute bottom-0 left-0 w-16 h-16 bg-white/10 rounded-full transform -translate-x-4 translate-y-4 group-hover:scale-125 transition-transform duration-500"></div>
+                                    
+                                    <!-- Content -->
+                                    <div class="relative z-10">
+                                        <div class="flex items-center justify-center w-16 h-16 bg-white/20 rounded-2xl mb-6 group-hover:rotate-12 transition-transform duration-300">
+                                            <i class="fas fa-fire text-2xl"></i>
+                                        </div>
+                                        <h3 class="text-2xl font-bold mb-3">Más Vendidos</h3>
+                                        <p class="text-white/90 mb-4">Los productos favoritos de nuestros clientes</p>
+                                        <div class="flex items-center text-sm font-semibold">
+                                            <span>Explorar</span>
+                                            <i class="fas fa-arrow-right ml-2 group-hover:translate-x-2 transition-transform duration-300"></i>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Hover effect overlay -->
+                                    <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
+                                </div>
+                            </div>
+
+                            <!-- Ofertas -->
+                            <div class="menu-card group cursor-pointer transform transition-all duration-500 hover:scale-105" onclick="navigateToSpecial('onsale')">
+                                <div class="relative bg-gradient-to-br from-red-500 to-pink-600 rounded-2xl p-8 text-white overflow-hidden">
+                                    <!-- Background Image -->
+                                    <div class="absolute inset-0 opacity-100 group-hover:opacity-100 transition-opacity duration-300">
+                                        <img src="https://images.unsplash.com/photo-1519689373023-dd07c7988603?w=400&h=400&fit=crop" 
+                                             alt="Baby Clothes Sale" 
+                                             class="w-full h-full object-cover rounded-2xl">
+                                    </div>
+                                    
+                                    <!-- Gradient overlay -->
+                                    <div class="absolute inset-0 bg-gradient-to-br from-red-500/70 to-pink-600/70 rounded-2xl"></div>
+                                    
+                                    <!-- Animated background elements -->
+                                    <div class="absolute top-0 left-0 w-20 h-20 bg-white/20 rounded-full transform -translate-x-6 -translate-y-6 group-hover:scale-150 transition-transform duration-700"></div>
+                                    <div class="absolute bottom-0 right-0 w-12 h-12 bg-white/10 rounded-full transform translate-x-3 translate-y-3 group-hover:scale-125 transition-transform duration-500"></div>
+                                    
+                                    <!-- Content -->
+                                    <div class="relative z-10">
+                                        <div class="flex items-center justify-center w-16 h-16 bg-white/20 rounded-2xl mb-6 group-hover:rotate-12 transition-transform duration-300">
+                                            <i class="fas fa-tags text-2xl"></i>
+                                        </div>
+                                        <h3 class="text-2xl font-bold mb-3">Ofertas</h3>
+                                        <p class="text-white/90 mb-4">Descuentos increíbles por tiempo limitado</p>
+                                        <div class="flex items-center text-sm font-semibold">
+                                            <span>Ver ofertas</span>
+                                            <i class="fas fa-arrow-right ml-2 group-hover:translate-x-2 transition-transform duration-300"></i>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Sale badge -->
+                                    <div class="absolute top-4 right-4 bg-yellow-400 text-red-600 font-bold text-xs px-2 py-1 rounded-full animate-pulse">
+                                        SALE
+                                    </div>
+                                    
+                                    <!-- Hover effect overlay -->
+                                    <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
+                                </div>
+                            </div>
+
+                            <!-- Trending -->
+                            <div class="menu-card group cursor-pointer transform transition-all duration-500 hover:scale-105" onclick="navigateToSpecial('trending')">
+                                <div class="relative bg-gradient-to-br from-purple-600 to-blue-600 rounded-2xl p-8 text-white overflow-hidden">
+                                    <!-- Background Image -->
+                                    <div class="absolute inset-0 opacity-100 group-hover:opacity-100 transition-opacity duration-300">
+                                        <img src="https://images.unsplash.com/photo-1519689680058-324335c77eba?w=400&h=400&fit=crop" 
+                                             alt="Trending Baby Fashion" 
+                                             class="w-full h-full object-cover rounded-2xl">
+                                    </div>
+                                    
+                                    <!-- Gradient overlay -->
+                                    <div class="absolute inset-0 bg-gradient-to-br from-purple-600/70 to-blue-600/70 rounded-2xl"></div>
+                                    
+                                    <!-- Animated background elements -->
+                                    <div class="absolute top-0 right-0 w-18 h-18 bg-white/20 rounded-full transform translate-x-4 -translate-y-4 group-hover:scale-150 transition-transform duration-700"></div>
+                                    <div class="absolute bottom-0 left-0 w-14 h-14 bg-white/10 rounded-full transform -translate-x-2 translate-y-2 group-hover:scale-125 transition-transform duration-500"></div>
+                                    
+                                    <!-- Content -->
+                                    <div class="relative z-10">
+                                        <div class="flex items-center justify-center w-16 h-16 bg-white/20 rounded-2xl mb-6 group-hover:rotate-12 transition-transform duration-300">
+                                            <i class="fas fa-trending-up text-2xl"></i>
+                                        </div>
+                                        <h3 class="text-2xl font-bold mb-3">Trending</h3>
+                                        <p class="text-white/90 mb-4">Lo que está de moda ahora mismo</p>
+                                        <div class="flex items-center text-sm font-semibold">
+                                            <span>Ver trending</span>
+                                            <i class="fas fa-arrow-right ml-2 group-hover:translate-x-2 transition-transform duration-300"></i>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Trending indicator -->
+                                    <div class="absolute top-4 right-4 flex items-center space-x-1">
+                                        <div class="w-2 h-2 bg-green-400 rounded-full animate-ping"></div>
+                                        <div class="w-2 h-2 bg-green-400 rounded-full animate-ping" style="animation-delay: 0.2s"></div>
+                                        <div class="w-2 h-2 bg-green-400 rounded-full animate-ping" style="animation-delay: 0.4s"></div>
+                                    </div>
+                                    
+                                    <!-- Hover effect overlay -->
+                                    <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Floating particles animation -->
+                        <div class="absolute inset-0 pointer-events-none">
+                            <div class="absolute top-10 left-10 w-2 h-2 bg-purple-400/30 rounded-full animate-bounce" style="animation-delay: 0s; animation-duration: 3s;"></div>
+                            <div class="absolute top-20 right-20 w-1 h-1 bg-pink-400/40 rounded-full animate-bounce" style="animation-delay: 1s; animation-duration: 4s;"></div>
+                            <div class="absolute bottom-16 left-1/4 w-1.5 h-1.5 bg-blue-400/35 rounded-full animate-bounce" style="animation-delay: 2s; animation-duration: 5s;"></div>
+                            <div class="absolute bottom-32 right-1/3 w-1 h-1 bg-yellow-400/40 rounded-full animate-bounce" style="animation-delay: 0.5s; animation-duration: 3.5s;"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Load all home content
+            loadCarousel();
+            loadProducts();
+            displayCategoriesGrid();
+            
+            // Reset category selection
+            selectedCategory = null;
+            hideSubcategories();
+            
+            // Update category buttons
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Scroll to top of page
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        function displayCategoriesGrid() {
+            const grid = document.getElementById('categoriesGrid');
+            if (!grid || categories.length === 0) return;
+            
+            grid.innerHTML = categories.filter(cat => !cat.parent_id).map(category => {
+                return `
+                    <div onclick="selectCategory(${category.id})" 
+                         class="group cursor-pointer transform hover:scale-105 transition-all duration-500">
+                        <div class="relative rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl h-64 transition-all duration-500">
+                            <!-- Background Image -->
+                            <div class="absolute inset-0">
+                                <img src="${category.image_url || 'https://images.unsplash.com/photo-1519689680058-324335c77eba?w=400&h=400&fit=crop'}" 
+                                     alt="${category.name}" 
+                                     class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                            </div>
+                            
+                            <!-- Glass Effect Overlay -->
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+                            
+                            <!-- Content -->
+                            <div class="absolute bottom-0 left-0 right-0 p-6">
+                                <div class="backdrop-blur-sm bg-white/10 rounded-2xl p-4 border border-white/20">
+                                    <h3 class="font-bold text-xl mb-2 text-white">${category.name}</h3>
+                                    <div class="flex items-center justify-between text-white/80">
+                                        <span class="text-sm">${category.product_count} productos</span>
+                                        <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-sm">
+                                            <i class="fas fa-arrow-right text-white text-sm"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Hover Effect -->
+                            <div class="absolute inset-0 bg-pink-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function showLogin() {
+            hideAllViews();
+            // Hide carousel when showing login
+            document.getElementById('heroCarousel').classList.add('hidden');
+            document.getElementById('loginView').classList.remove('hidden');
+            // Hide categories bar when showing login
+            document.getElementById('categoriesBar').classList.add('hidden');
+            
+            // Initialize Google Sign-In button
+            setTimeout(() => {
+                google.accounts.id.initialize({
+                    client_id: GOOGLE_CLIENT_ID,
+                    callback: handleGoogleLogin,
+                    auto_select: false,
+                    cancel_on_tap_outside: true
+                });
+                
+                google.accounts.id.renderButton(
+                    document.getElementById('googleSignInButton'),
+                    {
+                        theme: 'outline',
+                        size: 'large',
+                        width: '100%',
+                        text: 'signin_with',
+                        shape: 'rectangular'
+                    }
+                );
+            }, 100);
+        }
+
+        function showRegister() {
+            hideAllViews();
+            // Hide carousel when showing register
+            document.getElementById('heroCarousel').classList.add('hidden');
+            document.getElementById('registerView').classList.remove('hidden');
+            // Hide categories bar when showing register
+            document.getElementById('categoriesBar').classList.add('hidden');
+            
+            // Initialize Google Sign-In button for register page
+            setTimeout(() => {
+                google.accounts.id.initialize({
+                    client_id: GOOGLE_CLIENT_ID,
+                    callback: handleGoogleLogin,
+                    auto_select: false,
+                    cancel_on_tap_outside: true
+                });
+                
+                google.accounts.id.renderButton(
+                    document.getElementById('googleSignInButtonRegister'),
+                    {
+                        theme: 'outline',
+                        size: 'large',
+                        width: '100%',
+                        text: 'signup_with',
+                        shape: 'rectangular'
+                    }
+                );
+            }, 100);
+        }
+
+        function hideAllViews() {
+            document.getElementById('heroCarousel').classList.add('hidden');
+            document.getElementById('homeView').classList.add('hidden');
+            document.getElementById('loginView').classList.add('hidden');
+            document.getElementById('registerView').classList.add('hidden');
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            
+            toastMessage.textContent = message;
+            toast.className = `fixed bottom-4 right-4 px-6 py-3 rounded-lg shadow-lg transform transition-transform duration-300 ${
+                type === 'error' ? 'bg-red-500' : 'bg-green-500'
+            } text-white`;
+            
+            toast.style.transform = 'translateY(0)';
+            
+            setTimeout(() => {
+                toast.style.transform = 'translateY(100%)';
+            }, 3000);
+        }
+
+        // Check for existing auth token on load
+        async function checkAuth() {
+            if (authToken) {
+                try {
+                    const response = await apiCall('/auth/me');
+                    currentUser = response.user;
+                    updateAuthUI();
+                } catch (error) {
+                    // Token might be invalid
+                    logout();
+                }
+            }
+        }
+
+        // Category Functions
+        let categories = [];
+        let selectedCategory = null;
+        let allCategoriesOpen = false;
+
+        async function loadCategories() {
+            try {
+                const response = await apiCall('/categories');
+                categories = response.categories;
+                console.log('📋 Categorías cargadas:', categories);
+                console.log('🔍 Subcategorías por categoría:', categories.map(c => ({ 
+                    name: c.name, 
+                    subcategories: c.subcategories?.length || 0 
+                })));
+                displayCategories();
+                displayAllCategoriesGrid();
+                displayCategoriesGrid(); // También mostrar en el home
+            } catch (error) {
+                console.error('Failed to load categories');
+            }
+        }
+
+        function displayCategories() {
+            const mainCategoriesMenu = document.getElementById('mainCategoriesMenu');
+            
+            // Display main categories as modern cards with images
+            mainCategoriesMenu.innerHTML = categories.map(category => `
+                <div 
+                    id="category-${category.id}"
+                    class="category-card-nav relative w-32 h-20 rounded-xl overflow-hidden cursor-pointer transform hover:scale-105 transition-all duration-300 ${selectedCategory?.id === category.id ? 'ring-2 ring-pink-500' : ''} shadow-lg hover:shadow-xl"
+                    onclick="selectCategory(${category.id})">
+                    <div class="absolute inset-0">
+                        <img src="${category.image_url || 'https://images.unsplash.com/photo-1519689680058-324335c77eba?w=400&h=300&fit=crop'}" 
+                             alt="${category.name}" 
+                             class="w-full h-full object-cover transition-transform duration-300 hover:scale-110">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
+                    </div>
+                    <div class="absolute bottom-0 left-0 right-0 p-2">
+                        <div class="backdrop-blur-sm bg-white/10 rounded-lg p-1 border border-white/20">
+                            <h4 class="text-xs font-semibold text-white">${category.name}</h4>
+                            <span class="text-xs text-white/80">${category.product_count} items</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+
+        function selectCategory(categoryId) {
+            const category = categories.find(c => c.id === categoryId);
+            if (!category) return;
+
+            console.log('🎯 Categoría seleccionada:', category.name);
+            console.log('📋 Subcategorías disponibles:', category.subcategories?.length || 0);
+            console.log('🔍 Subcategorías:', category.subcategories);
+
+            // Show loading instantly
+            document.getElementById('loadingSpinner').classList.remove('hidden');
+            document.querySelector('main').classList.add('filter', 'blur-sm', 'transition-all');
+
+            // Update selected category
+            selectedCategory = category;
+            
+            // Update active state
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(`category-${categoryId}`).classList.add('active');
+
+            // Hide all categories grid if open
+            if (allCategoriesOpen) {
+                toggleAllCategories();
+            }
+
+            // Show subcategories if available
+            if (category.subcategories && category.subcategories.length > 0) {
+                console.log('✅ Mostrando subcategorías');
+                showSubcategories(category);
+            } else {
+                console.log('❌ No hay subcategorías');
+                hideSubcategories();
+            }
+            
+            // Always show category products when a category is selected
+            // Small delay to ensure loading is visible
+            setTimeout(() => {
+                showCategoryProducts(categoryId, null, category.name);
+            }, 50);
+        }
+
+        function showSubcategories(category) {
+            const subcategoriesBar = document.getElementById('subcategoriesBar');
+            const subcategoriesMenu = document.getElementById('subcategoriesMenu');
+            
+            // Build subcategories content with image cards - altura reducida
+            subcategoriesMenu.innerHTML = `
+                <div class="flex items-center space-x-4 w-full py-1">
+                    <div class="flex space-x-2 overflow-x-auto">
+                        <div 
+                            onclick="showCategoryProducts(${category.id}, null, '${category.name} - Ver Todo')"
+                            class="subcategory-card relative w-32 h-10 rounded-lg overflow-hidden cursor-pointer transform hover:scale-105 transition-all duration-300 flex-shrink-0 group">
+                            <div class="absolute inset-0">
+                                <img src="${category.image_url || 'https://images.unsplash.com/photo-1519689680058-324335c77eba?w=300&h=200&fit=crop'}" 
+                                     alt="Ver Todo" 
+                                     class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+                                <div class="absolute inset-0 bg-gradient-to-t from-pink-600/90 to-pink-600/40"></div>
+                            </div>
+                            <div class="absolute inset-0 flex items-center justify-center text-white">
+                                <div class="text-center">
+                                    <p class="text-xs font-bold">Ver Todo (${category.product_count})</p>
+                                </div>
+                            </div>
+                        </div>
+                        ${category.subcategories.map(sub => `
+                            <div 
+                                onclick="showCategoryProducts(${category.id}, ${sub.id}, '${category.name} - ${sub.name}')"
+                                class="subcategory-card relative w-32 h-10 rounded-lg overflow-hidden cursor-pointer transform hover:scale-105 transition-all duration-300 flex-shrink-0 group">
+                                <div class="absolute inset-0">
+                                    <img src="${sub.image_url || 'https://images.unsplash.com/photo-1519689680058-324335c77eba?w=300&h=200&fit=crop'}" 
+                                         alt="${sub.name}" 
+                                         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+                                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
+                                </div>
+                                <div class="absolute inset-0 flex items-center px-2 text-white">
+                                    <p class="text-xs font-bold truncate">${sub.name} (${sub.product_count})</p>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            
+            // Animate subcategories bar
+            subcategoriesBar.style.height = 'auto';
+            const height = subcategoriesBar.offsetHeight;
+            subcategoriesBar.style.height = '0';
+            setTimeout(() => {
+                subcategoriesBar.style.height = height + 'px';
+            }, 10);
+        }
+
+        function hideSubcategories() {
+            const subcategoriesBar = document.getElementById('subcategoriesBar');
+            subcategoriesBar.style.height = '0';
+        }
+
+        function toggleAllCategories() {
+            const grid = document.getElementById('allCategoriesGrid');
+            allCategoriesOpen = !allCategoriesOpen;
+            
+            if (allCategoriesOpen) {
+                grid.classList.remove('hidden');
+                setTimeout(() => {
+                    grid.classList.remove('opacity-0', '-translate-y-4');
+                    grid.classList.add('opacity-100', 'translate-y-0');
+                }, 10);
+                hideSubcategories();
+            } else {
+                grid.classList.remove('opacity-100', 'translate-y-0');
+                grid.classList.add('opacity-0', '-translate-y-4');
+                setTimeout(() => {
+                    grid.classList.add('hidden');
+                }, 300);
+            }
+        }
+
+        function displayAllCategoriesGrid() {
+            const grid = document.getElementById('allCategoriesGrid').querySelector('.grid');
+            
+            grid.innerHTML = categories.map(category => `
+                <div class="category-card bg-white rounded-lg p-4 border-2 border-gray-100 hover:border-pink-300 cursor-pointer text-center"
+                     onclick="selectCategory(${category.id}); toggleAllCategories();">
+                    <h3 class="font-semibold text-gray-800">${category.name}</h3>
+                    <p class="text-sm text-gray-500 mt-1">${category.product_count} productos</p>
+                    ${category.subcategories.length > 0 ? 
+                        `<p class="text-xs text-pink-600 mt-2">${category.subcategories.length} subcategorías</p>` 
+                        : ''}
+                </div>
+            `).join('');
+        }
+
+        async function loadCategoryFeaturedProducts(categoryId) {
+            try {
+                const response = await apiCall(`/categories/${categoryId}/products?limit=3`);
+                const megaMenu = document.getElementById('megaMenu');
+                const productsContainer = megaMenu.querySelector('.col-span-3 .grid');
+                
+                if (response.products.length > 0) {
+                    productsContainer.innerHTML = response.products.map(product => `
+                        <div class="product-preview cursor-pointer" onclick="showProductDetail(${product.id})">
+                            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                                <img src="${product.image_url}" alt="${product.name}" 
+                                     class="w-full h-32 object-cover">
+                                <div class="p-3">
+                                    <h5 class="text-sm font-medium text-gray-800 truncate">${product.name}</h5>
+                                    <p class="text-pink-600 font-bold mt-1">$${product.price}</p>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Failed to load featured products');
+            }
+        }
+
+        async function showCategoryProducts(categoryId, subcategoryId = null, categoryName = '') {
+            console.log('showCategoryProducts called with categoryId:', categoryId, 'subcategoryId:', subcategoryId);
+            
+            // Hide carousel and other views first
+            hideAllViews();
+            document.getElementById('homeView').classList.remove('hidden');
+            
+            // Show loading instantly before API call
+            document.getElementById('loadingSpinner').classList.remove('hidden');
+            // Add blur to main content
+            document.querySelector('main').classList.add('filter', 'blur-sm', 'transition-all');
+            
+            try {
+                // Build API URL with subcategory if provided
+                let apiUrl = `/products/category/${categoryId}?limit=12`;
+                if (subcategoryId) {
+                    apiUrl += `&subcategory=${subcategoryId}`;
+                }
+                
+                const response = await apiCall(apiUrl, {
+                    skipLoading: true  // Skip the apiCall loading since we already showed it
+                });
+                console.log('Products received:', response.products.length, 'for category:', categoryId, 'subcategory:', subcategoryId);
+                
+                // Find category info (could be main category or subcategory)
+                let categoryInfo = categories.find(c => c.id === categoryId);
+                if (!categoryInfo) {
+                    // Check in subcategories
+                    for (let cat of categories) {
+                        if (cat.subcategories) {
+                            const sub = cat.subcategories.find(s => s.id === categoryId);
+                            if (sub) {
+                                categoryInfo = sub;
+                                break;
+                            }
+                        }
+                    }
+                }
+                
+                document.getElementById('homeView').innerHTML = `
+                    <div class="mb-8">
+                        <div class="flex items-center mb-4">
+                            <button onclick="showHome()" class="text-pink-600 hover:text-pink-800 mr-3">
+                                <i class="fas fa-arrow-left"></i>
+                            </button>
+                            <h2 class="text-3xl font-bold text-gray-800">
+                                ${categoryName || (categoryInfo ? categoryInfo.name : 'Categoría')}
+                            </h2>
+                            <span class="ml-3 text-gray-500">(${response.products.length} productos)</span>
+                        </div>
+                        <div id="productGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                            ${response.products.map(product => createProductCard(product)).join('')}
+                        </div>
+                    </div>
+                `;
+                
+                // Update categories bar to show active state
+                document.querySelectorAll('.category-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                // Find parent category if it's a subcategory
+                const parentCategory = categories.find(c => 
+                    c.subcategories && c.subcategories.some(s => s.id === categoryId)
+                );
+                
+                if (parentCategory) {
+                    document.getElementById(`category-${parentCategory.id}`)?.classList.add('active');
+                } else {
+                    document.getElementById(`category-${categoryId}`)?.classList.add('active');
+                }
+                
+            } catch (error) {
+                console.error('Error loading category products:', error);
+                showToast('Error al cargar productos', 'error');
+            } finally {
+                hideLoading();
+                // Remove blur
+                document.querySelector('main').classList.remove('filter', 'blur-sm');
+                
+                // Scroll to top of the page
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            }
+        }
+
+        function createProductCard(product) {
+            const stockLabel = product.stock_quantity < 10 
+                ? `<span class="absolute top-3 left-3 bg-yellow-400 text-yellow-900 px-3 py-1 rounded-full text-xs font-semibold">
+                     Pocas unidades
+                   </span>` 
+                : '';
+                
+            return `
+                <div class="group relative bg-white rounded-3xl overflow-hidden transform hover:-translate-y-2 transition-all duration-300 cursor-pointer" 
+                     onclick="showProductDetail(${product.id})">
+                    <div class="relative aspect-square overflow-hidden bg-gray-100">
+                        <img src="${product.image_url}" 
+                             alt="${product.name}" 
+                             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+                        ${stockLabel}
+                        <button onclick="event.stopPropagation(); addToCart(${product.id})" 
+                                class="absolute bottom-3 right-3 bg-gray-900 text-white w-10 h-10 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-gray-800">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    <div class="p-5">
+                        <p class="text-sm text-gray-500 mb-1">${product.category_name}</p>
+                        <h3 class="font-semibold text-gray-900 mb-2 line-clamp-1">${product.name}</h3>
+                        <div class="flex items-center justify-between">
+                            <span class="text-2xl font-bold text-gray-900">$${product.price}</span>
+                            <button onclick="event.stopPropagation(); addToCart(${product.id})" 
+                                    class="bg-gray-900 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-800 transition-colors">
+                                Agregar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+
+        // Update loadProducts to use createProductCard
+        async function loadProducts() {
+            try {
+                const response = await apiCall('/products?limit=12');
+                const productGrid = document.getElementById('productGrid');
+                productGrid.innerHTML = response.products.map(product => createProductCard(product)).join('');
+            } catch (error) {
+                // Error already handled in apiCall
+            }
+        }
+
+        // Setup mega menu mouse events
+        // document.addEventListener('DOMContentLoaded', () => {
+        //     const megaMenu = document.getElementById('megaMenu');
+        //     megaMenu.addEventListener('mouseenter', () => clearTimeout(currentMegaMenuTimeout));
+        //     megaMenu.addEventListener('mouseleave', scheduleMegaMenuHide);
+        // });
+
+        // Carousel Functions
+        let carouselProducts = [];
+        let currentSlide = 0;
+        let carouselInterval;
+
+        async function loadCarousel() {
+            try {
+                // Load featured products for carousel
+                const response = await apiCall('/products/featured');
+                carouselProducts = response.products;
+                
+                if (carouselProducts.length > 0) {
+                    displayCarousel();
+                    startCarousel();
+                }
+            } catch (error) {
+                console.error('Failed to load carousel');
+            }
+        }
+
+        function displayCarousel() {
+            const slidesContainer = document.getElementById('carouselSlides');
+            const dotsContainer = document.getElementById('carouselDots');
+            
+            // Create slides
+            slidesContainer.innerHTML = carouselProducts.map((product, index) => `
+                <div class="carousel-slide ${index === 0 ? 'active' : ''}" data-slide="${index}">
+                    <div class="relative w-full h-full">
+                        <!-- Background image blurred -->
+                        <div class="absolute inset-0">
+                            <img src="${product.image_url}" 
+                                 alt="${product.name} background" 
+                                 class="w-full h-full object-cover filter blur-3xl scale-110">
+                        </div>
+                        
+                        <!-- Color overlay -->
+                        <div class="absolute inset-0 bg-gradient-to-r from-purple-900/70 via-pink-900/60 to-transparent"></div>
+                        
+                        <div class="container mx-auto px-4 h-full flex items-center relative z-10">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center max-w-6xl mx-auto">
+                                <!-- Product Info -->
+                                <div class="text-white z-10 order-2 md:order-1">
+                                    <span class="inline-block bg-pink-600 text-white px-4 py-1 rounded-full text-sm mb-4">
+                                        ${product.category_name || 'Destacado'}
+                                    </span>
+                                    <h2 class="text-4xl md:text-5xl font-bold mb-4 drop-shadow-lg">
+                                        ${product.name}
+                                    </h2>
+                                    <p class="text-lg mb-6 opacity-90 line-clamp-3">
+                                        ${product.description}
+                                    </p>
+                                    <div class="flex items-center space-x-6">
+                                        <span class="text-3xl font-bold">$${product.price}</span>
+                                        <button onclick="addToCart(${product.id})" 
+                                                class="bg-pink-600 hover:bg-pink-700 text-white px-8 py-3 rounded-full font-medium transition-all transform hover:scale-105 shadow-lg">
+                                            <i class="fas fa-shopping-cart mr-2"></i>
+                                            Comprar Ahora
+                                        </button>
+                                    </div>
+                                    ${product.stock_quantity < 10 ? 
+                                        '<p class="mt-4 text-yellow-300"><i class="fas fa-exclamation-circle mr-2"></i>¡Últimas unidades disponibles!</p>' 
+                                        : ''}
+                                </div>
+                                
+                                <!-- Product Image -->
+                                <div class="relative order-1 md:order-2">
+                                    <div class="relative rounded-2xl overflow-hidden shadow-2xl transform hover:scale-105 transition-transform duration-500">
+                                        <img src="${product.image_url}" 
+                                             alt="${product.name}" 
+                                             class="w-full h-80 md:h-96 object-cover">
+                                        <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            // Create dots
+            dotsContainer.innerHTML = carouselProducts.map((_, index) => `
+                <button class="carousel-dot ${index === 0 ? 'active' : ''}" 
+                        onclick="goToSlide(${index})"
+                        aria-label="Ir a slide ${index + 1}">
+                </button>
+            `).join('');
+            
+            // Show navigation arrows
+            document.getElementById('prevSlide').style.opacity = '1';
+            document.getElementById('nextSlide').style.opacity = '1';
+        }
+
+        function startCarousel() {
+            carouselInterval = setInterval(nextSlide, 5000); // Change slide every 5 seconds
+        }
+
+        function stopCarousel() {
+            clearInterval(carouselInterval);
+        }
+
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % carouselProducts.length;
+            updateCarousel();
+        }
+
+        function prevSlide() {
+            currentSlide = (currentSlide - 1 + carouselProducts.length) % carouselProducts.length;
+            updateCarousel();
+        }
+
+        function goToSlide(index) {
+            currentSlide = index;
+            updateCarousel();
+            stopCarousel();
+            startCarousel(); // Restart the interval
+        }
+
+        function updateCarousel() {
+            // Update slides
+            document.querySelectorAll('.carousel-slide').forEach((slide, index) => {
+                slide.classList.toggle('active', index === currentSlide);
+            });
+            
+            // Update dots
+            document.querySelectorAll('.carousel-dot').forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentSlide);
+            });
+        }
+
+        // Setup carousel controls
+        document.addEventListener('DOMContentLoaded', () => {
+            const prevBtn = document.getElementById('prevSlide');
+            const nextBtn = document.getElementById('nextSlide');
+            const carousel = document.getElementById('heroCarousel');
+            
+            prevBtn.addEventListener('click', () => {
+                prevSlide();
+                stopCarousel();
+                startCarousel();
+            });
+            
+            nextBtn.addEventListener('click', () => {
+                nextSlide();
+                stopCarousel();
+                startCarousel();
+            });
+            
+            // Pause on hover
+            carousel.addEventListener('mouseenter', stopCarousel);
+            carousel.addEventListener('mouseleave', startCarousel);
+        });
+
+        // Navigate to special collections
+        async function navigateToSpecial(type) {
+            console.log('🎯 Navigating to special collection:', type);
+            hideSubcategories();
+            
+            // Show loading instantly
+            document.getElementById('loadingSpinner').classList.remove('hidden');
+            document.querySelector('main').classList.add('filter', 'blur-sm', 'transition-all');
+            
+            try {
+                let title = '';
+                let description = '';
+                let products = [];
+                
+                // Por ahora usamos productos regulares con filtros para demo
+                const allProductsResponse = await apiCall('/products?limit=20', {
+                    skipLoading: true
+                });
+                
+                switch(type) {
+                    case 'bestsellers':
+                        title = 'Más Vendidos';
+                        description = 'Los productos favoritos de nuestros clientes';
+                        // Simulamos más vendidos con los primeros productos
+                        products = allProductsResponse.products.slice(0, 8).map(p => ({
+                            ...p,
+                            sales_count: Math.floor(Math.random() * 100) + 50
+                        }));
+                        break;
+                    case 'onsale':
+                        title = 'Ofertas Especiales';
+                        description = 'Descuentos increíbles por tiempo limitado';
+                        // Simulamos ofertas con descuentos
+                        products = allProductsResponse.products.slice(3, 11).map(p => ({
+                            ...p,
+                            is_on_sale: true,
+                            sale_price: (p.price * 0.7).toFixed(2),
+                            discount_percentage: 30
+                        }));
+                        break;
+                    case 'trending':
+                        title = 'Trending Now';
+                        description = 'Lo que está de moda ahora mismo';
+                        // Simulamos trending con productos aleatorios
+                        products = allProductsResponse.products.slice(5, 13).map(p => ({
+                            ...p,
+                            view_count: Math.floor(Math.random() * 1000) + 200
+                        }));
+                        break;
+                    default:
+                        throw new Error('Invalid collection type');
+                }
+                
+                const response = { products };
+                console.log(`📦 ${title} products received:`, response.products.length);
+                
+                // Get appropriate icon and color for each type
+                let iconClass = '';
+                let colorClass = '';
+                
+                switch(type) {
+                    case 'bestsellers':
+                        iconClass = 'fas fa-fire';
+                        colorClass = 'from-yellow-400/70 to-orange-500/70';
+                        break;
+                    case 'onsale':
+                        iconClass = 'fas fa-tags';
+                        colorClass = 'from-red-500/70 to-pink-600/70';
+                        break;
+                    case 'trending':
+                        iconClass = 'fas fa-trending-up';
+                        colorClass = 'from-purple-600/70 to-blue-600/70';
+                        break;
+                }
+                
+                // Crear páginas innovadoras y únicas para cada sección
+                let pageHTML = '';
+                
+                if (type === 'bestsellers') {
+                    pageHTML = createBestsellersPage(response.products, iconClass, colorClass);
+                } else if (type === 'onsale') {
+                    pageHTML = createOffersPage(response.products, iconClass, colorClass);
+                } else if (type === 'trending') {
+                    pageHTML = createTrendingPage(response.products, iconClass, colorClass);
+                }
+                
+                document.getElementById('homeView').innerHTML = pageHTML;
+                
+                hideLoading();
+                document.querySelector('main').classList.remove('filter', 'blur-sm');
+                
+                // Scroll to the new content after it's loaded
+                setTimeout(() => {
+                    const homeView = document.getElementById('homeView');
+                    if (homeView) {
+                        // Get the position and add some offset for better visibility
+                        const yOffset = -200; // Negative value to add more space at top
+                        const y = homeView.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                        
+                        window.scrollTo({
+                            top: y,
+                            behavior: 'smooth'
+                        });
+                    }
+                }, 100);
+                
+            } catch (error) {
+                console.error(`Failed to load ${type}:`, error);
+                hideLoading();
+                document.querySelector('main').classList.remove('filter', 'blur-sm');
+                showToast('Error al cargar los productos', 'error');
+            }
+        }
+
+        // 🔥 PÁGINA INNOVADORA: MÁS VENDIDOS 
+        function createBestsellersPage(products, iconClass, colorClass) {
+            return `
+                <div class="min-h-screen">
+                    <!-- Header Épico con Rankings -->
+                    <div class="bg-gradient-to-r ${colorClass} rounded-3xl p-8 mb-8 text-white relative overflow-hidden">
+                        <!-- Background Image -->
+                        <div class="absolute inset-0">
+                            <img src="https://images.unsplash.com/photo-1522771930-78848d9293e8?w=1200&h=400&fit=crop" 
+                                 alt="Best Selling Baby Clothes" 
+                                 class="w-full h-full object-cover rounded-3xl">
+                        </div>
+                        
+                        <!-- Gradient overlay -->
+                        <div class="absolute inset-0 bg-gradient-to-r ${colorClass} rounded-3xl"></div>
+                        
+                        <!-- Partículas de fuego animadas -->
+                        <div class="absolute inset-0">
+                            <div class="fire-particle absolute top-10 left-1/4 w-3 h-3 bg-yellow-300 rounded-full animate-bounce opacity-60" style="animation-delay: 0s; animation-duration: 1.5s;"></div>
+                            <div class="fire-particle absolute top-20 right-1/3 w-2 h-2 bg-orange-400 rounded-full animate-bounce opacity-80" style="animation-delay: 0.3s; animation-duration: 2s;"></div>
+                            <div class="fire-particle absolute bottom-16 left-1/3 w-4 h-4 bg-red-400 rounded-full animate-bounce opacity-70" style="animation-delay: 0.6s; animation-duration: 1.8s;"></div>
+                        </div>
+                        
+                        <div class="relative z-10">
+                            <div class="flex items-center justify-between mb-6">
+                                <div class="flex items-center">
+                                    <button onclick="showHome()" class="text-white/80 hover:text-white mr-4 text-2xl">
+                                        <i class="fas fa-arrow-left"></i>
+                                    </button>
+                                    <div class="flex items-center">
+                                        <div class="flex items-center justify-center w-16 h-16 bg-white/20 rounded-xl mr-4 animate-pulse">
+                                            <i class="${iconClass} text-2xl"></i>
+                                        </div>
+                                        <div>
+                                            <h1 class="text-5xl font-bold mb-2">MÁS VENDIDOS</h1>
+                                            <p class="text-white/90 text-xl">🔥 Los favoritos de nuestros clientes</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="bg-white/20 rounded-2xl p-4 backdrop-blur-sm">
+                                        <p class="text-3xl font-bold">${products.length}</p>
+                                        <p class="text-white/80">Productos Top</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Stats Innovadores -->
+                            <div class="grid grid-cols-3 gap-4 mb-6">
+                                <div class="bg-white/10 rounded-2xl p-4 text-center backdrop-blur-sm">
+                                    <div class="text-2xl font-bold text-yellow-300">+2.5K</div>
+                                    <div class="text-white/80 text-sm">Ventas Esta Semana</div>
+                                </div>
+                                <div class="bg-white/10 rounded-2xl p-4 text-center backdrop-blur-sm">
+                                    <div class="text-2xl font-bold text-green-300">98%</div>
+                                    <div class="text-white/80 text-sm">Satisfacción</div>
+                                </div>
+                                <div class="bg-white/10 rounded-2xl p-4 text-center backdrop-blur-sm">
+                                    <div class="text-2xl font-bold text-blue-300">#1</div>
+                                    <div class="text-white/80 text-sm">En Categoría</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Grid de Productos con Rankings -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        ${products.map((product, index) => `
+                            <div class="relative product-card bg-white rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 group">
+                                <!-- Ranking Badge -->
+                                <div class="absolute top-4 left-4 z-20">
+                                    <div class="flex items-center justify-center w-12 h-12 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full text-white font-bold text-lg shadow-lg">
+                                        #${index + 1}
+                                    </div>
+                                </div>
+                                
+                                <!-- Fire Badge -->
+                                <div class="absolute top-4 right-4 z-20">
+                                    <div class="bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold animate-pulse">
+                                        🔥 HOT
+                                    </div>
+                                </div>
+
+                                <div class="relative aspect-square overflow-hidden">
+                                    <img src="${product.image_url || 'https://images.unsplash.com/photo-1519689680058-324335c77eba?w=400&h=400&fit=crop'}" 
+                                         alt="${product.name}" 
+                                         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 cursor-pointer"
+                                         onclick="trackViewAndShowDetail(${product.id})">
+                                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                </div>
+
+                                <div class="p-6">
+                                    <h3 class="font-bold text-lg text-gray-800 mb-2 cursor-pointer group-hover:text-orange-600 transition-colors" onclick="trackViewAndShowDetail(${product.id})">${product.name}</h3>
+                                    
+                                    <!-- Sales Stats -->
+                                    <div class="flex items-center mb-3">
+                                        <div class="flex items-center bg-green-100 rounded-full px-3 py-1 mr-2">
+                                            <i class="fas fa-chart-line text-green-600 text-xs mr-1"></i>
+                                            <span class="text-green-700 text-xs font-semibold">${product.sales_count || Math.floor(Math.random() * 100) + 50} ventas</span>
+                                        </div>
+                                        <div class="flex text-yellow-400">
+                                            ${'★'.repeat(5)}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex items-center justify-between mb-4">
+                                        <span class="text-2xl font-bold text-orange-600">$${product.price}</span>
+                                        <span class="text-sm text-gray-500">${product.category_name || 'Bebé'}</span>
+                                    </div>
+                                    
+                                    <div class="flex space-x-2">
+                                        <button onclick="addToCart(${product.id})" 
+                                                class="flex-1 bg-gradient-to-r from-orange-500 to-red-500 text-white py-3 px-4 rounded-xl hover:from-orange-600 hover:to-red-600 transition-all duration-300 text-sm font-bold transform hover:scale-105">
+                                            <i class="fas fa-cart-plus mr-2"></i>¡COMPRAR!
+                                        </button>
+                                        <button onclick="trackViewAndShowDetail(${product.id})" 
+                                                class="bg-gray-200 text-gray-700 py-3 px-4 rounded-xl hover:bg-gray-300 transition-colors">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Efecto de brillo -->
+                                <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 pointer-events-none"></div>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    ${products.length === 0 ? `
+                        <div class="text-center py-20">
+                            <div class="text-8xl mb-6">🔥</div>
+                            <h3 class="text-3xl font-bold text-gray-800 mb-4">¡Próximamente más bestsellers!</h3>
+                            <p class="text-gray-600 mb-8 text-lg">Los productos más vendidos aparecerán aquí pronto</p>
+                            <button onclick="showHome()" class="bg-gradient-to-r from-orange-500 to-red-500 text-white px-8 py-4 rounded-xl hover:from-orange-600 hover:to-red-600 transition-all duration-300 font-bold text-lg">
+                                <i class="fas fa-home mr-2"></i>Volver al Inicio
+                            </button>
+                        </div>
+                    ` : ''}
+                    
+                    ${createSpecialNavigation('bestsellers')}
+                </div>
+            `;
+        }
+
+        // 🏷️ PÁGINA INNOVADORA: OFERTAS 
+        function createOffersPage(products, iconClass, colorClass) {
+            return `
+                <div class="min-h-screen">
+                    <!-- Header Dinámico con Timer -->
+                    <div class="bg-gradient-to-r ${colorClass} rounded-3xl p-8 mb-8 text-white relative overflow-hidden">
+                        <!-- Background Image -->
+                        <div class="absolute inset-0">
+                            <img src="https://images.unsplash.com/photo-1519689373023-dd07c7988603?w=1200&h=400&fit=crop" 
+                                 alt="Baby Clothes Sale" 
+                                 class="w-full h-full object-cover rounded-3xl">
+                        </div>
+                        
+                        <!-- Gradient overlay -->
+                        <div class="absolute inset-0 bg-gradient-to-r ${colorClass} rounded-3xl"></div>
+                        
+                        <!-- Elementos de Ofertas Animados -->
+                        <div class="absolute inset-0">
+                            <div class="sale-element absolute top-8 right-20 text-yellow-300 text-4xl animate-bounce" style="animation-delay: 0s;">💰</div>
+                            <div class="sale-element absolute bottom-12 left-16 text-yellow-300 text-3xl animate-bounce" style="animation-delay: 0.5s;">🎉</div>
+                            <div class="sale-element absolute top-16 left-1/3 text-yellow-300 text-2xl animate-bounce" style="animation-delay: 1s;">⚡</div>
+                        </div>
+                        
+                        <div class="relative z-10">
+                            <div class="flex items-center justify-between mb-6">
+                                <div class="flex items-center">
+                                    <button onclick="showHome()" class="text-white/80 hover:text-white mr-4 text-2xl">
+                                        <i class="fas fa-arrow-left"></i>
+                                    </button>
+                                    <div class="flex items-center">
+                                        <div class="flex items-center justify-center w-16 h-16 bg-white/20 rounded-xl mr-4 animate-pulse">
+                                            <i class="${iconClass} text-2xl"></i>
+                                        </div>
+                                        <div>
+                                            <h1 class="text-5xl font-bold mb-2">SUPER OFERTAS</h1>
+                                            <p class="text-white/90 text-xl">🔥 ¡Aprovecha estos descuentos únicos!</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Timer Countdown -->
+                                <div class="bg-white/20 rounded-2xl p-6 backdrop-blur-sm text-center">
+                                    <p class="text-white/80 text-sm mb-2">OFERTA TERMINA EN:</p>
+                                    <div class="flex items-center space-x-2 text-2xl font-bold">
+                                        <div class="bg-white/30 rounded-lg px-3 py-2">
+                                            <span id="hours">23</span>
+                                            <div class="text-xs">HRS</div>
+                                        </div>
+                                        <span>:</span>
+                                        <div class="bg-white/30 rounded-lg px-3 py-2">
+                                            <span id="minutes">45</span>
+                                            <div class="text-xs">MIN</div>
+                                        </div>
+                                        <span>:</span>
+                                        <div class="bg-white/30 rounded-lg px-3 py-2">
+                                            <span id="seconds">30</span>
+                                            <div class="text-xs">SEG</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Estadísticas de Ofertas -->
+                            <div class="grid grid-cols-4 gap-4">
+                                <div class="bg-white/10 rounded-2xl p-4 text-center backdrop-blur-sm">
+                                    <div class="text-2xl font-bold text-yellow-300">hasta 50%</div>
+                                    <div class="text-white/80 text-sm">Descuento Máx</div>
+                                </div>
+                                <div class="bg-white/10 rounded-2xl p-4 text-center backdrop-blur-sm">
+                                    <div class="text-2xl font-bold text-green-300">${products.length}</div>
+                                    <div class="text-white/80 text-sm">Productos</div>
+                                </div>
+                                <div class="bg-white/10 rounded-2xl p-4 text-center backdrop-blur-sm">
+                                    <div class="text-2xl font-bold text-blue-300">24hrs</div>
+                                    <div class="text-white/80 text-sm">Tiempo Límite</div>
+                                </div>
+                                <div class="bg-white/10 rounded-2xl p-4 text-center backdrop-blur-sm">
+                                    <div class="text-2xl font-bold text-pink-300">🚀</div>
+                                    <div class="text-white/80 text-sm">Envío Gratis</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Grid de Ofertas Espectaculares -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        ${products.map((product, index) => `
+                            <div class="relative product-card bg-white rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 group">
+                                <!-- Mega Descuento Badge -->
+                                <div class="absolute top-0 left-0 z-20">
+                                    <div class="bg-gradient-to-r from-red-500 to-pink-500 text-white px-4 py-2 rounded-br-2xl font-bold text-lg shadow-lg">
+                                        -${product.discount_percentage || 30}%
+                                    </div>
+                                </div>
+                                
+                                <!-- Sale Ribbon -->
+                                <div class="absolute top-6 right-6 z-20">
+                                    <div class="bg-yellow-400 text-red-600 px-3 py-1 rounded-full text-xs font-bold animate-pulse transform rotate-12">
+                                        ¡OFERTA!
+                                    </div>
+                                </div>
+
+                                <div class="relative aspect-square overflow-hidden">
+                                    <img src="${product.image_url || 'https://images.unsplash.com/photo-1519689680058-324335c77eba?w=400&h=400&fit=crop'}" 
+                                         alt="${product.name}" 
+                                         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 cursor-pointer"
+                                         onclick="trackViewAndShowDetail(${product.id})">
+                                    
+                                    <!-- Overlay de Oferta -->
+                                    <div class="absolute inset-0 bg-gradient-to-t from-red-500/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-6">
+                                        <div class="text-white font-bold text-lg animate-pulse">¡ÚLTIMA OPORTUNIDAD!</div>
+                                    </div>
+                                </div>
+
+                                <div class="p-6">
+                                    <h3 class="font-bold text-lg text-gray-800 mb-2 cursor-pointer group-hover:text-red-600 transition-colors" onclick="trackViewAndShowDetail(${product.id})">${product.name}</h3>
+                                    
+                                    <!-- Precios con Descuento Destacado -->
+                                    <div class="mb-4">
+                                        <div class="flex items-center space-x-3 mb-2">
+                                            <span class="text-3xl font-bold text-red-600">$${product.sale_price || (product.price * 0.7).toFixed(2)}</span>
+                                            <span class="text-lg text-gray-500 line-through">$${product.price}</span>
+                                        </div>
+                                        <div class="bg-green-100 rounded-full px-3 py-1 inline-block">
+                                            <span class="text-green-700 text-sm font-bold">¡Ahorras $${(product.price - (product.sale_price || product.price * 0.7)).toFixed(2)}!</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Urgencia -->
+                                    <div class="flex items-center mb-4 bg-orange-50 rounded-lg p-2">
+                                        <i class="fas fa-clock text-orange-500 mr-2"></i>
+                                        <span class="text-orange-700 text-sm font-semibold">¡Solo quedan ${Math.floor(Math.random() * 5) + 2} unidades!</span>
+                                    </div>
+                                    
+                                    <div class="flex space-x-2">
+                                        <button onclick="addToCart(${product.id})" 
+                                                class="flex-1 bg-gradient-to-r from-red-500 to-pink-500 text-white py-3 px-4 rounded-xl hover:from-red-600 hover:to-pink-600 transition-all duration-300 text-sm font-bold transform hover:scale-105 animate-pulse">
+                                            <i class="fas fa-lightning-bolt mr-2"></i>¡COMPRAR YA!
+                                        </button>
+                                        <button onclick="trackViewAndShowDetail(${product.id})" 
+                                                class="bg-gray-200 text-gray-700 py-3 px-4 rounded-xl hover:bg-gray-300 transition-colors">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Efecto de resplandor -->
+                                <div class="absolute inset-0 bg-gradient-to-r from-transparent via-red-300/20 to-transparent -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700 pointer-events-none"></div>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    ${products.length === 0 ? `
+                        <div class="text-center py-20">
+                            <div class="text-8xl mb-6">🏷️</div>
+                            <h3 class="text-3xl font-bold text-gray-800 mb-4">¡Próximamente más ofertas!</h3>
+                            <p class="text-gray-600 mb-8 text-lg">Estamos preparando descuentos increíbles para ti</p>
+                            <button onclick="showHome()" class="bg-gradient-to-r from-red-500 to-pink-500 text-white px-8 py-4 rounded-xl hover:from-red-600 hover:to-pink-600 transition-all duration-300 font-bold text-lg">
+                                <i class="fas fa-home mr-2"></i>Volver al Inicio
+                            </button>
+                        </div>
+                    ` : ''}
+                    
+                    ${createSpecialNavigation('onsale')}
+                </div>
+                
+                <script>
+                    // Timer countdown animado
+                    (function() {
+                        function updateCountdown() {
+                            const hoursEl = document.getElementById('hours');
+                            const minutesEl = document.getElementById('minutes'); 
+                            const secondsEl = document.getElementById('seconds');
+                            
+                            if (hoursEl && minutesEl && secondsEl) {
+                                let seconds = parseInt(secondsEl.textContent);
+                                let minutes = parseInt(minutesEl.textContent);
+                                let hours = parseInt(hoursEl.textContent);
+                                
+                                seconds--;
+                                if (seconds < 0) {
+                                    seconds = 59;
+                                    minutes--;
+                                    if (minutes < 0) {
+                                        minutes = 59;
+                                        hours--;
+                                        if (hours < 0) {
+                                            hours = 23;
+                                            minutes = 59;
+                                            seconds = 59;
+                                        }
+                                    }
+                                }
+                                
+                                hoursEl.textContent = hours.toString().padStart(2, '0');
+                                minutesEl.textContent = minutes.toString().padStart(2, '0');
+                                secondsEl.textContent = seconds.toString().padStart(2, '0');
+                            }
+                        }
+                        
+                        const countdownInterval = setInterval(updateCountdown, 5000);
+                    })();
+                <\/script>
+            `;
+        }
+
+        // 📈 PÁGINA INNOVADORA: TRENDING 
+        function createTrendingPage(products, iconClass, colorClass) {
+            return `
+                <div class="min-h-screen">
+                    <!-- Header Futurista con Métricas en Vivo -->
+                    <div class="bg-gradient-to-r ${colorClass} rounded-3xl p-8 mb-8 text-white relative overflow-hidden">
+                        <!-- Background Image -->
+                        <div class="absolute inset-0">
+                            <img src="https://images.unsplash.com/photo-1519689680058-324335c77eba?w=1200&h=400&fit=crop" 
+                                 alt="Trending Baby Fashion" 
+                                 class="w-full h-full object-cover rounded-3xl">
+                        </div>
+                        
+                        <!-- Gradient overlay -->
+                        <div class="absolute inset-0 bg-gradient-to-r ${colorClass} rounded-3xl"></div>
+                        
+                        <!-- Partículas Digitales -->
+                        <div class="absolute inset-0">
+                            <div class="trending-particle absolute top-12 left-1/4 w-2 h-2 bg-green-400 rounded-full animate-ping"></div>
+                            <div class="trending-particle absolute top-24 right-1/3 w-3 h-3 bg-blue-400 rounded-full animate-ping" style="animation-delay: 0.5s;"></div>
+                            <div class="trending-particle absolute bottom-20 left-1/2 w-2 h-2 bg-purple-400 rounded-full animate-ping" style="animation-delay: 1s;"></div>
+                            <div class="trending-particle absolute top-32 right-1/4 w-1 h-1 bg-pink-400 rounded-full animate-ping" style="animation-delay: 1.5s;"></div>
+                        </div>
+                        
+                        <div class="relative z-10">
+                            <div class="flex items-center justify-between mb-6">
+                                <div class="flex items-center">
+                                    <button onclick="showHome()" class="text-white/80 hover:text-white mr-4 text-2xl">
+                                        <i class="fas fa-arrow-left"></i>
+                                    </button>
+                                    <div class="flex items-center">
+                                        <div class="flex items-center justify-center w-16 h-16 bg-white/20 rounded-xl mr-4">
+                                            <i class="${iconClass} text-2xl animate-pulse"></i>
+                                        </div>
+                                        <div>
+                                            <h1 class="text-5xl font-bold mb-2">TRENDING NOW</h1>
+                                            <p class="text-white/90 text-xl">🚀 Lo más viral del momento</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Métricas en Vivo -->
+                                <div class="bg-white/20 rounded-2xl p-6 backdrop-blur-sm">
+                                    <div class="text-center mb-2">
+                                        <div class="flex items-center justify-center space-x-1 mb-1">
+                                            <div class="w-2 h-2 bg-green-400 rounded-full animate-ping"></div>
+                                            <div class="w-2 h-2 bg-green-400 rounded-full animate-ping" style="animation-delay: 0.2s"></div>
+                                            <div class="w-2 h-2 bg-green-400 rounded-full animate-ping" style="animation-delay: 0.4s"></div>
+                                        </div>
+                                        <p class="text-white/80 text-sm">EN VIVO</p>
+                                    </div>
+                                    <div class="text-3xl font-bold" id="liveViews">2,847</div>
+                                    <div class="text-white/80 text-sm">personas viendo</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Panel de Trending Stats -->
+                            <div class="grid grid-cols-4 gap-4">
+                                <div class="bg-white/10 rounded-2xl p-4 text-center backdrop-blur-sm">
+                                    <div class="text-2xl font-bold text-green-300">↗ +245%</div>
+                                    <div class="text-white/80 text-sm">Crecimiento</div>
+                                </div>
+                                <div class="bg-white/10 rounded-2xl p-4 text-center backdrop-blur-sm">
+                                    <div class="text-2xl font-bold text-blue-300">#${Math.floor(Math.random() * 3) + 1}</div>
+                                    <div class="text-white/80 text-sm">En Rankings</div>
+                                </div>
+                                <div class="bg-white/10 rounded-2xl p-4 text-center backdrop-blur-sm">
+                                    <div class="text-2xl font-bold text-purple-300">🔥</div>
+                                    <div class="text-white/80 text-sm">Viral</div>
+                                </div>
+                                <div class="bg-white/10 rounded-2xl p-4 text-center backdrop-blur-sm">
+                                    <div class="text-2xl font-bold text-pink-300">24h</div>
+                                    <div class="text-white/80 text-sm">Trending</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Grid de Productos Trending con Métricas -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        ${products.map((product, index) => `
+                            <div class="relative product-card bg-white rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 group">
+                                <!-- Trending Badge Dinámico -->
+                                <div class="absolute top-4 left-4 z-20">
+                                    <div class="flex items-center bg-gradient-to-r from-purple-500 to-blue-500 text-white px-3 py-1 rounded-full text-xs font-bold">
+                                        <div class="w-2 h-2 bg-green-400 rounded-full animate-ping mr-2"></div>
+                                        TRENDING #${index + 1}
+                                    </div>
+                                </div>
+                                
+                                <!-- Viral Indicator -->
+                                <div class="absolute top-4 right-4 z-20">
+                                    <div class="bg-gradient-to-r from-pink-500 to-purple-500 text-white px-2 py-1 rounded-full text-xs font-bold animate-bounce">
+                                        🚀 VIRAL
+                                    </div>
+                                </div>
+
+                                <div class="relative aspect-square overflow-hidden">
+                                    <img src="${product.image_url || 'https://images.unsplash.com/photo-1519689680058-324335c77eba?w=400&h=400&fit=crop'}" 
+                                         alt="${product.name}" 
+                                         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 cursor-pointer"
+                                         onclick="trackViewAndShowDetail(${product.id})">
+                                    
+                                    <!-- Overlay con Métricas -->
+                                    <div class="absolute inset-0 bg-gradient-to-t from-purple-500/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-6">
+                                        <div class="text-white font-bold text-center">
+                                            <div class="text-lg">📈 ${product.view_count || Math.floor(Math.random() * 1000) + 200} views</div>
+                                            <div class="text-sm">últimas 24h</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="p-6">
+                                    <h3 class="font-bold text-lg text-gray-800 mb-2 cursor-pointer group-hover:text-purple-600 transition-colors" onclick="trackViewAndShowDetail(${product.id})">${product.name}</h3>
+                                    
+                                    <!-- Métricas de Tendencia -->
+                                    <div class="mb-4">
+                                        <div class="flex items-center space-x-2 mb-2">
+                                            <div class="bg-green-100 rounded-full px-2 py-1 flex items-center">
+                                                <i class="fas fa-eye text-green-600 text-xs mr-1"></i>
+                                                <span class="text-green-700 text-xs font-semibold">${product.view_count || Math.floor(Math.random() * 1000) + 200}</span>
+                                            </div>
+                                            <div class="bg-purple-100 rounded-full px-2 py-1 flex items-center">
+                                                <i class="fas fa-heart text-purple-600 text-xs mr-1"></i>
+                                                <span class="text-purple-700 text-xs font-semibold">${Math.floor(Math.random() * 100) + 50}</span>
+                                            </div>
+                                            <div class="bg-blue-100 rounded-full px-2 py-1 flex items-center">
+                                                <i class="fas fa-share text-blue-600 text-xs mr-1"></i>
+                                                <span class="text-blue-700 text-xs font-semibold">${Math.floor(Math.random() * 50) + 10}</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Barra de Trending -->
+                                        <div class="w-full bg-gray-200 rounded-full h-2 mb-2">
+                                            <div class="bg-gradient-to-r from-purple-500 to-blue-500 h-2 rounded-full" style="width: ${Math.floor(Math.random() * 60) + 40}%"></div>
+                                        </div>
+                                        <div class="text-xs text-gray-500">Popularidad en tiempo real</div>
+                                    </div>
+                                    
+                                    <div class="flex items-center justify-between mb-4">
+                                        <span class="text-2xl font-bold text-purple-600">$${product.price}</span>
+                                        <span class="text-sm text-gray-500">${product.category_name || 'Trending'}</span>
+                                    </div>
+                                    
+                                    <div class="flex space-x-2">
+                                        <button onclick="addToCart(${product.id})" 
+                                                class="flex-1 bg-gradient-to-r from-purple-500 to-blue-500 text-white py-3 px-4 rounded-xl hover:from-purple-600 hover:to-blue-600 transition-all duration-300 text-sm font-bold transform hover:scale-105">
+                                            <i class="fas fa-rocket mr-2"></i>¡ÚNETE AL TREND!
+                                        </button>
+                                        <button onclick="trackViewAndShowDetail(${product.id})" 
+                                                class="bg-gray-200 text-gray-700 py-3 px-4 rounded-xl hover:bg-gray-300 transition-colors">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Efecto holográfico -->
+                                <div class="absolute inset-0 bg-gradient-to-r from-transparent via-purple-300/10 to-transparent -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 pointer-events-none"></div>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    ${products.length === 0 ? `
+                        <div class="text-center py-20">
+                            <div class="text-8xl mb-6">📈</div>
+                            <h3 class="text-3xl font-bold text-gray-800 mb-4">¡Descubre las nuevas tendencias!</h3>
+                            <p class="text-gray-600 mb-8 text-lg">Los productos más populares aparecerán aquí</p>
+                            <button onclick="showHome()" class="bg-gradient-to-r from-purple-500 to-blue-500 text-white px-8 py-4 rounded-xl hover:from-purple-600 hover:to-blue-600 transition-all duration-300 font-bold text-lg">
+                                <i class="fas fa-home mr-2"></i>Volver al Inicio
+                            </button>
+                        </div>
+                    ` : ''}
+                    
+                    ${createSpecialNavigation('trending')}
+                </div>
+                
+                <script>
+                    // Simulador de métricas en vivo
+                    (function() {
+                        function updateLiveMetrics() {
+                            const liveViewsEl = document.getElementById('liveViews');
+                            if (liveViewsEl) {
+                                const currentViews = parseInt(liveViewsEl.textContent.replace(',', ''));
+                                const newViews = currentViews + Math.floor(Math.random() * 10) + 1;
+                                liveViewsEl.textContent = newViews.toLocaleString();
+                            }
+                        }
+                        
+                        const metricsInterval = setInterval(updateLiveMetrics, 5000);
+                    })();
+                <\/script>
+            `;
+        }
+
+        // Create navigation menu for switching between special sections
+        function createSpecialNavigation(currentType) {
+            return `
+                <div class="mt-16 mb-8">
+                    <div class="bg-gradient-to-r from-purple-100 to-pink-100 rounded-3xl p-8">
+                        <h3 class="text-2xl font-bold text-center mb-6 text-gray-800">Explora Más</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <!-- Volver al Sitio -->
+                            <div class="group cursor-pointer" onclick="showHome()">
+                                <div class="relative bg-gradient-to-r from-gray-400 to-gray-600 rounded-2xl p-6 text-white transform transition-all duration-300 hover:scale-105 hover:shadow-2xl overflow-hidden">
+                                    <!-- Background Image -->
+                                    <div class="absolute inset-0">
+                                        <img src="https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=400&h=200&fit=crop" 
+                                             alt="Home" 
+                                             class="w-full h-full object-cover rounded-2xl">
+                                    </div>
+                                    <!-- Gradient overlay -->
+                                    <div class="absolute inset-0 bg-gradient-to-r from-gray-400/70 to-gray-600/70 rounded-2xl"></div>
+                                    
+                                    <div class="relative z-10 flex items-center">
+                                        <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mr-4">
+                                            <i class="fas fa-home text-2xl"></i>
+                                        </div>
+                                        <div class="flex-1">
+                                            <h4 class="text-xl font-bold mb-1">Volver al Sitio</h4>
+                                            <p class="text-white/90 text-sm">Página principal</p>
+                                        </div>
+                                        <i class="fas fa-arrow-right text-xl group-hover:translate-x-2 transition-transform"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            ${currentType !== 'bestsellers' ? `
+                                <div class="group cursor-pointer" onclick="navigateToSpecial('bestsellers')">
+                                    <div class="relative bg-gradient-to-r from-yellow-400 to-orange-500 rounded-2xl p-6 text-white transform transition-all duration-300 hover:scale-105 hover:shadow-2xl overflow-hidden">
+                                        <!-- Background Image -->
+                                        <div class="absolute inset-0">
+                                            <img src="https://images.unsplash.com/photo-1522771930-78848d9293e8?w=400&h=200&fit=crop" 
+                                                 alt="Best Sellers" 
+                                                 class="w-full h-full object-cover rounded-2xl">
+                                        </div>
+                                        <!-- Gradient overlay -->
+                                        <div class="absolute inset-0 bg-gradient-to-r from-yellow-400/70 to-orange-500/70 rounded-2xl"></div>
+                                        
+                                        <div class="relative z-10 flex items-center">
+                                            <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mr-4">
+                                                <i class="fas fa-fire text-2xl"></i>
+                                            </div>
+                                            <div class="flex-1">
+                                                <h4 class="text-xl font-bold mb-1">Más Vendidos</h4>
+                                                <p class="text-white/90 text-sm">Los favoritos</p>
+                                            </div>
+                                            <i class="fas fa-arrow-right text-xl group-hover:translate-x-2 transition-transform"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            ` : ''}
+                            
+                            ${currentType !== 'onsale' ? `
+                                <div class="group cursor-pointer" onclick="navigateToSpecial('onsale')">
+                                    <div class="relative bg-gradient-to-r from-red-500 to-pink-600 rounded-2xl p-6 text-white transform transition-all duration-300 hover:scale-105 hover:shadow-2xl overflow-hidden">
+                                        <!-- Background Image -->
+                                        <div class="absolute inset-0">
+                                            <img src="https://images.unsplash.com/photo-1519689373023-dd07c7988603?w=400&h=200&fit=crop" 
+                                                 alt="Sales" 
+                                                 class="w-full h-full object-cover rounded-2xl">
+                                        </div>
+                                        <!-- Gradient overlay -->
+                                        <div class="absolute inset-0 bg-gradient-to-r from-red-500/70 to-pink-600/70 rounded-2xl"></div>
+                                        
+                                        <div class="relative z-10 flex items-center">
+                                            <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mr-4">
+                                                <i class="fas fa-tags text-2xl"></i>
+                                            </div>
+                                            <div class="flex-1">
+                                                <h4 class="text-xl font-bold mb-1">Ofertas</h4>
+                                                <p class="text-white/90 text-sm">Descuentos</p>
+                                            </div>
+                                            <i class="fas fa-arrow-right text-xl group-hover:translate-x-2 transition-transform"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            ` : ''}
+                            
+                            ${currentType !== 'trending' ? `
+                                <div class="group cursor-pointer" onclick="navigateToSpecial('trending')">
+                                    <div class="relative bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl p-6 text-white transform transition-all duration-300 hover:scale-105 hover:shadow-2xl overflow-hidden">
+                                        <!-- Background Image -->
+                                        <div class="absolute inset-0">
+                                            <img src="https://images.unsplash.com/photo-1519689680058-324335c77eba?w=400&h=200&fit=crop" 
+                                                 alt="Trending" 
+                                                 class="w-full h-full object-cover rounded-2xl">
+                                        </div>
+                                        <!-- Gradient overlay -->
+                                        <div class="absolute inset-0 bg-gradient-to-r from-purple-600/70 to-blue-600/70 rounded-2xl"></div>
+                                        
+                                        <div class="relative z-10 flex items-center">
+                                            <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mr-4">
+                                                <i class="fas fa-trending-up text-2xl"></i>
+                                            </div>
+                                            <div class="flex-1">
+                                                <h4 class="text-xl font-bold mb-1">Trending</h4>
+                                                <p class="text-white/90 text-sm">Lo popular</p>
+                                            </div>
+                                            <i class="fas fa-arrow-right text-xl group-hover:translate-x-2 transition-transform"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Enhanced product card creation with special badges
+        function createProductCard(product, collectionType = null) {
+            let specialBadge = '';
+            
+            if (collectionType === 'bestsellers') {
+                specialBadge = `<div class="absolute top-2 left-2 bg-yellow-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                    <i class="fas fa-fire mr-1"></i>Best Seller
+                </div>`;
+            } else if (collectionType === 'onsale') {
+                const discountPercentage = product.discount_percentage || 
+                    (product.sale_price ? Math.round(((product.price - product.sale_price) / product.price) * 100) : 0);
+                specialBadge = `<div class="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                    -${discountPercentage}% OFF
+                </div>`;
+            } else if (collectionType === 'trending') {
+                specialBadge = `<div class="absolute top-2 left-2 bg-purple-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                    <i class="fas fa-trending-up mr-1"></i>Trending
+                </div>`;
+            }
+            
+            const finalPrice = product.final_price || product.sale_price || product.price;
+            const originalPrice = product.price;
+            const showOriginalPrice = finalPrice < originalPrice;
+            
+            return `
+                <div class="product-card bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                    <div class="relative aspect-square overflow-hidden">
+                        ${specialBadge}
+                        <img src="${product.image_url || 'https://images.unsplash.com/photo-1519689680058-324335c77eba?w=400&h=400&fit=crop'}" 
+                             alt="${product.name}" 
+                             class="w-full h-full object-cover cursor-pointer" 
+                             onclick="trackViewAndShowDetail(${product.id})">
+                        <div class="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-10 transition-all duration-300"></div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2 line-clamp-2 cursor-pointer" onclick="trackViewAndShowDetail(${product.id})">${product.name}</h3>
+                        <p class="text-gray-600 text-sm mb-3 line-clamp-2">${product.description || ''}</p>
+                        
+                        <div class="flex items-center justify-between mb-3">
+                            <div>
+                                ${showOriginalPrice ? 
+                                    `<div class="flex items-center space-x-2">
+                                        <span class="text-xl font-bold text-red-600">$${finalPrice}</span>
+                                        <span class="text-sm text-gray-500 line-through">$${originalPrice}</span>
+                                    </div>` :
+                                    `<span class="text-xl font-bold text-green-600">$${finalPrice}</span>`
+                                }
+                            </div>
+                            <span class="text-xs text-gray-500">${product.category_name || 'Sin categoría'}</span>
+                        </div>
+                        
+                        <div class="flex space-x-2">
+                            <button onclick="addToCart(${product.id})" 
+                                    class="flex-1 bg-pink-600 text-white py-2 px-4 rounded-lg hover:bg-pink-700 transition-colors text-sm font-semibold">
+                                <i class="fas fa-cart-plus mr-2"></i>Agregar
+                            </button>
+                            <button onclick="trackViewAndShowDetail(${product.id})" 
+                                    class="bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Track product view and show detail
+        async function trackViewAndShowDetail(productId) {
+            // Track the view for trending calculation
+            try {
+                await apiCall(`/products/${productId}/view`, { method: 'POST' });
+                console.log(`📈 View tracked for product ${productId}`);
+            } catch (error) {
+                console.log('Failed to track view:', error);
+            }
+            
+            // Show product detail
+            showProductDetail(productId);
+        }
+
+        // Initialize app
+        window.onload = async () => {
+            await checkAuth();
+            showHome();
+            loadCart();
+            loadCategories();
+            loadCarousel();
+        };
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            const userMenu = document.getElementById('userMenu');
+            const dropdown = document.getElementById('userDropdown');
+            if (!userMenu.contains(e.target)) {
+                dropdown.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
