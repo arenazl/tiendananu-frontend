@@ -2,10 +2,10 @@
 // Cambia esto según tu entorno
 const API_CONFIG = {
     // Desarrollo local
-    development: 'http://localhost:3000/api',
+    development: 'https://tiendananuajuares-api-3de86a59b55e.herokuapp.com//api',
     
     // Producción - TiendaNanuAjuares
-     production: 'https://tiendananuajuares-api.herokuapp.com/api'
+     production: 'https://tiendananuajuares-api-3de86a59b55e.herokuapp.com/api'
 };
 
 // Detectar entorno automáticamente
